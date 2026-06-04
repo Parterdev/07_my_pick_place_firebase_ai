@@ -1,21 +1,21 @@
 import React from 'react';
-import {Text} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {AppTabParamList} from '../types/navigation';
-import {HomeScreen} from '../screens/app/HomeScreen';
-import {CapturePlaceScreen} from '../screens/app/CapturePlaceScreen';
-import {GalleryScreen} from '../screens/app/GalleryScreen';
-import {ProfileScreen} from '../screens/app/ProfileScreen';
-import {useThemeMode} from '../hooks/useThemeMode';
+import { Text } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { AppTabParamList } from '../types/navigation';
+import { HomeScreen } from '../screens/app/HomeScreen';
+import { CapturePlaceScreen } from '../screens/app/CapturePlaceScreen';
+import { GalleryNavigator } from './GalleryNavigator';
+import { ProfileScreen } from '../screens/app/ProfileScreen';
+import { useThemeMode } from '../hooks/useThemeMode';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
-const TabIcon = ({emoji}: {emoji: string}) => {
-  return <Text style={{fontSize: 22}}>{emoji}</Text>;
+const TabIcon = ({ emoji }: { emoji: string }) => {
+  return <Text style={{ fontSize: 22 }}>{emoji}</Text>;
 };
 
 export const AppTabs = () => {
-  const {colors} = useThemeMode();
+  const { colors } = useThemeMode();
 
   return (
     <Tab.Navigator
@@ -55,7 +55,7 @@ export const AppTabs = () => {
 
       <Tab.Screen
         name="Gallery"
-        component={GalleryScreen}
+        component={GalleryNavigator}
         options={{
           title: 'Galería',
           tabBarIcon: () => <TabIcon emoji="🖼️" />,

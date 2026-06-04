@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TextStyle,
   ViewStyle,
 } from 'react-native';
 import {useThemeMode} from '../hooks/useThemeMode';
@@ -14,6 +15,7 @@ interface AppButtonProps {
   loading?: boolean;
   variant?: 'primary' | 'secondary' | 'ghost';
   style?: ViewStyle;
+  textStyle?: TextStyle;
 }
 
 export const AppButton = ({
@@ -22,6 +24,7 @@ export const AppButton = ({
   loading = false,
   variant = 'primary',
   style,
+  textStyle,
 }: AppButtonProps) => {
   const {colors} = useThemeMode();
 
@@ -45,6 +48,7 @@ export const AppButton = ({
       disabled={loading}
       style={({pressed}) => [
         styles.button,
+        variant === 'ghost' && styles.ghostButton,
         {
           backgroundColor,
           opacity: pressed || loading ? 0.75 : 1,
@@ -54,7 +58,9 @@ export const AppButton = ({
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <Text style={[styles.text, {color: textColor}]}>{title}</Text>
+        <Text style={[styles.text, {color: textColor}, textStyle]}>
+          {title}
+        </Text>
       )}
     </Pressable>
   );
@@ -68,6 +74,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
+  },
+  ghostButton: {
+    width: 'auto',
+    height: 'auto',
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
   },
   text: {
     fontSize: 15,

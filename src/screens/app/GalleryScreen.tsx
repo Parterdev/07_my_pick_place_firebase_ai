@@ -8,6 +8,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {GalleryStackParamList} from '../../types/navigation';
 import {useFocusEffect} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {AppButton} from '../../components/AppButton';
@@ -17,7 +19,9 @@ import {useThemeMode} from '../../hooks/useThemeMode';
 import {listUserPlaceExperiences} from '../../services/places.service';
 import {PlaceExperience} from '../../types/place';
 
-export const GalleryScreen = () => {
+type Props = NativeStackScreenProps<GalleryStackParamList, 'GalleryList'>;
+
+export const GalleryScreen = ({navigation}: Props) => {
   const {colors} = useThemeMode();
   const {user} = useAuthContext();
 
@@ -113,7 +117,12 @@ export const GalleryScreen = () => {
             <AppButton title="Recargar galería" onPress={handleRefresh} />
           </View>
         }
-        renderItem={({item}) => <PlaceCard place={item} />}
+        renderItem={({ item }) => (
+          <PlaceCard
+            place={item}
+            onPress={() => navigation.navigate('PlaceDetail', { place: item })}
+          />
+        )}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
