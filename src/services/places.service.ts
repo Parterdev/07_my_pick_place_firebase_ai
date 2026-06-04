@@ -1,5 +1,8 @@
-import {CreatePlaceInput} from '../types/place';
-import {savePlaceExperience} from './firestore.service';
+import {CreatePlaceInput, PlaceExperience} from '../types/place';
+import {
+  getUserPlaceExperiences,
+  savePlaceExperience,
+} from './firestore.service';
 import {uploadPlaceImage} from './storage.service';
 
 const withTimeout = async <T>(
@@ -48,11 +51,17 @@ export const createPlaceExperience = async ({
       latitude: location.latitude,
       longitude: location.longitude,
     }),
-    15000,
+    30000,
     'El guardado en Firestore tardó demasiado.',
   );
 
   console.log('[Places] Experiencia creada:', placeId);
 
   return placeId;
+};
+
+export const listUserPlaceExperiences = async (
+  userId: string,
+): Promise<PlaceExperience[]> => {
+  return getUserPlaceExperiences(userId);
 };

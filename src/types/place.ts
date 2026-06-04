@@ -1,3 +1,4 @@
+import {Timestamp} from 'firebase/firestore';
 import {Asset} from 'react-native-image-picker';
 
 export interface PlaceLocation {
@@ -6,14 +7,14 @@ export interface PlaceLocation {
 }
 
 export interface PlaceExperience {
-  id?: string;
+  id: string;
   userId: string;
   title: string;
   description: string;
   imageUrl: string;
   latitude: number;
   longitude: number;
-  createdAt?: unknown;
+  createdAt?: Timestamp | null;
 }
 
 export interface CreatePlaceInput {

@@ -1,19 +1,46 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import {useThemeMode} from '../hooks/useThemeMode';
+import {PlaceExperience} from '../types/place';
+import {formatCoordinate, formatPlaceDate} from '../utils/formatters';
 
-export const PlaceCard = () => {
+interface PlaceCardProps {
+  place: PlaceExperience;
+}
+
+export const PlaceCard = ({place}: PlaceCardProps) => {
   const {colors} = useThemeMode();
 
   return (
     <View style={[styles.card, {backgroundColor: colors.card}]}>
-      <Text style={styles.emoji}>📍</Text>
+      <Image source={{uri: place.imageUrl}} style={styles.image} />
+
       <View style={styles.content}>
-        <Text style={[styles.title, {color: colors.text}]}>
-          Tu primera experiencia
+        <Text style={[styles.title, {color: colors.title}]} numberOfLines={1}>
+          {place.title}
         </Text>
-        <Text style={[styles.subtitle, {color: colors.muted}]}>
-          Pronto podrás guardar fotos, ubicación y recomendaciones.
+
+        <Text
+          style={[styles.description, {color: colors.muted}]}
+          numberOfLines={2}>
+          {place.description}
+        </Text>
+
+        <View
+          style={[
+            styles.locationBox,
+            {
+              backgroundColor: colors.input,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text style={[styles.locationText, {color: colors.muted}]}>
+            📍 {formatCoordinate(place.latitude)}, {formatCoordinate(place.longitude)}
+          </Text>
+        </View>
+
+        <Text style={[styles.date, {color: colors.muted}]}>
+          🕒 {formatPlaceDate(place.createdAt)}
         </Text>
       </View>
     </View>
@@ -22,26 +49,39 @@ export const PlaceCard = () => {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 24,
-    padding: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 18,
+    borderRadius: 26,
+    overflow: 'hidden',
+    marginBottom: 18,
   },
-  emoji: {
-    fontSize: 34,
-    marginRight: 14,
+  image: {
+    width: '100%',
+    height: 190,
   },
   content: {
-    flex: 1,
+    padding: 18,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
   },
-  subtitle: {
+  description: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 6,
+  },
+  locationBox: {
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginTop: 12,
+  },
+  locationText: {
     fontSize: 13,
-    marginTop: 4,
-    lineHeight: 18,
+    fontWeight: '600',
+  },
+  date: {
+    fontSize: 12,
+    marginTop: 10,
   },
 });
