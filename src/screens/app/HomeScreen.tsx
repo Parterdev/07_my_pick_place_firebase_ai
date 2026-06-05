@@ -14,8 +14,7 @@ import { AppButton } from '../../components/AppButton';
 import { useAuthContext } from '../../context/AuthContext';
 import { useThemeMode } from '../../hooks/useThemeMode';
 import { listUserPlaceExperiences } from '../../services/places.service';
-
-const imageIcon = require('../../assets/images/image_icon.png');
+import {imageAssets} from '../../assets/images';
 
 export const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuthContext();
@@ -76,7 +75,7 @@ export const HomeScreen = ({ navigation }: any) => {
         </Text>
 
         <View style={[styles.heroCard, { backgroundColor: colors.card }]}>
-          <Image source={imageIcon} style={styles.heroImage} />
+          <Image source={imageAssets.imageIcon} style={styles.heroImage} />
 
           <Text style={[styles.heroTitle, { color: colors.title }]}>
             ¿Capturamos algo ahora?

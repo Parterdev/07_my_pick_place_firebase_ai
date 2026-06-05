@@ -1,21 +1,49 @@
 import React from 'react';
-import { Text } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AppTabParamList } from '../types/navigation';
-import { HomeScreen } from '../screens/app/HomeScreen';
-import { CapturePlaceScreen } from '../screens/app/CapturePlaceScreen';
-import { GalleryNavigator } from './GalleryNavigator';
-import { ProfileScreen } from '../screens/app/ProfileScreen';
-import { useThemeMode } from '../hooks/useThemeMode';
+import {Image, ImageSourcePropType, StyleSheet, View} from 'react-native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {AppTabParamList} from '../types/navigation';
+import {HomeScreen} from '../screens/app/HomeScreen';
+import {CapturePlaceScreen} from '../screens/app/CapturePlaceScreen';
+import {ProfileScreen} from '../screens/app/ProfileScreen';
+import {useThemeMode} from '../hooks/useThemeMode';
+import {GalleryNavigator} from './GalleryNavigator';
+import {imageAssets, svgAssets} from '../assets/images';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
-const TabIcon = ({ emoji }: { emoji: string }) => {
-  return <Text style={{ fontSize: 22 }}>{emoji}</Text>;
+interface PngTabIconProps {
+  source: ImageSourcePropType;
+  focused: boolean;
+}
+
+const PngTabIcon = ({source, focused}: PngTabIconProps) => {
+  return (
+    <View style={[styles.iconWrapper, focused && styles.activeIconWrapper]}>
+      <Image
+        source={source}
+        style={[styles.pngIcon, focused && styles.activePngIcon]}
+        resizeMode="contain"
+      />
+    </View>
+  );
+};
+
+interface SvgTabIconProps {
+  focused: boolean;
+}
+
+const HomeTabIcon = ({focused}: SvgTabIconProps) => {
+  const HomeIcon = svgAssets.homeIcon;
+
+  return (
+    <View style={[styles.iconWrapper, focused && styles.activeIconWrapper]}>
+      <HomeIcon width={28} height={28} />
+    </View>
+  );
 };
 
 export const AppTabs = () => {
-  const { colors } = useThemeMode();
+  const {colors} = useThemeMode();
 
   return (
     <Tab.Navigator
@@ -25,14 +53,14 @@ export const AppTabs = () => {
           height: 68,
           paddingTop: 8,
           paddingBottom: 10,
-          backgroundColor: colors.card,
+          backgroundColor: colors.tabBar,
           borderTopColor: colors.border,
         },
-        tabBarActiveTintColor: colors.brand,
-        tabBarInactiveTintColor: colors.muted,
+        tabBarActiveTintColor: colors.tabActive,
+        tabBarInactiveTintColor: colors.tabInactive,
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '700',
+          fontWeight: '800',
         },
       }}>
       <Tab.Screen
@@ -40,7 +68,7 @@ export const AppTabs = () => {
         component={HomeScreen}
         options={{
           title: 'Inicio',
-          tabBarIcon: () => <TabIcon emoji="🏠" />,
+          tabBarIcon: ({focused}) => <HomeTabIcon focused={focused} />,
         }}
       />
 
@@ -49,7 +77,9 @@ export const AppTabs = () => {
         component={CapturePlaceScreen}
         options={{
           title: 'Capturar',
-          tabBarIcon: () => <TabIcon emoji="📸" />,
+          tabBarIcon: ({focused}) => (
+            <PngTabIcon source={imageAssets.captureIcon} focused={focused} />
+          ),
         }}
       />
 
@@ -58,9 +88,11 @@ export const AppTabs = () => {
         component={GalleryNavigator}
         options={{
           title: 'Galería',
-          tabBarIcon: () => <TabIcon emoji="🖼️" />,
+          tabBarIcon: ({focused}) => (
+            <PngTabIcon source={imageAssets.imageGalleryIcon} focused={focused} />
+          ),
         }}
-        listeners={({ navigation }) => ({
+        listeners={({navigation}) => ({
           tabPress: e => {
             e.preventDefault();
 
@@ -76,9 +108,31 @@ export const AppTabs = () => {
         component={ProfileScreen}
         options={{
           title: 'Perfil',
-          tabBarIcon: () => <TabIcon emoji="👤" />,
+          tabBarIcon: ({focused}) => (
+            <PngTabIcon source={imageAssets.settingIcon} focused={focused} />
+          ),
         }}
       />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  iconWrapper: {
+    width: 38,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeIconWrapper: {
+    transform: [{scale: 1.08}],
+  },
+  pngIcon: {
+    width: 28,
+    height: 28,
+    opacity: 0.72,
+  },
+  activePngIcon: {
+    opacity: 1,
+  },
+});
