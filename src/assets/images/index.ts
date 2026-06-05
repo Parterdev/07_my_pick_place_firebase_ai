@@ -6,9 +6,6 @@ import DoneIcon from './done_icon.svg';
 import BoxIcon from './box_icon.svg';
 
 export const imageAssets = {
-  login: require('./login.png') as ImageSourcePropType,
-  register: require('./register.png') as ImageSourcePropType,
-
   imageIcon: require('./image_icon.png') as ImageSourcePropType,
   captureIcon: require('./capture_icon.png') as ImageSourcePropType,
   imageGalleryIcon: require('./image_gallery_icon.png') as ImageSourcePropType,
@@ -37,6 +34,7 @@ export const imageAssets = {
   botIcon: require('./bot_icon.png') as ImageSourcePropType,
   sunIcon: require('./sun_icon.png') as ImageSourcePropType,
   moonIcon: require('./moon_icon.png') as ImageSourcePropType,
+  registerIcon: require('./register_icon.png') as ImageSourcePropType,
 };
 
 export const svgAssets = {

@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -9,17 +10,17 @@ import {
   Text,
   View,
 } from 'react-native';
+import FontAwesome from '@react-native-vector-icons/fontawesome-free-solid';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthStackParamList} from '../../types/navigation';
-import {AuthHeader} from '../../components/AuthHeader';
-import {AppInput} from '../../components/AppInput';
 import {AppButton} from '../../components/AppButton';
+import {AppInput} from '../../components/AppInput';
+import {imageAssets} from '../../assets/images';
 import {useAuthContext} from '../../context/AuthContext';
 import {useAuthForm} from '../../hooks/useAuthForm';
 import {useThemeMode} from '../../hooks/useThemeMode';
-import {validateRegisterForm} from '../../utils/validators';
+import {AuthStackParamList} from '../../types/navigation';
 import {formatFirebaseAuthError} from '../../utils/formatters';
-import {imageAssets} from '../../assets/images';
+import {validateRegisterForm} from '../../utils/validators';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -54,7 +55,7 @@ export const RegisterScreen = ({navigation}: Props) => {
 
     try {
       setLoading(true);
-      await register(name, email, password);
+      await register(name.trim(), email.trim(), password);
     } catch (error: any) {
       Alert.alert('Registro', formatFirebaseAuthError(error?.code));
     } finally {
@@ -68,64 +69,91 @@ export const RegisterScreen = ({navigation}: Props) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled">
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <AuthHeader
-            imageSource={imageAssets.register}
-            title="Sign Up to Explore"
-            subtitle="Crea tu cuenta y empieza a construir tu galería inteligente de lugares."
-          />
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
+        <View style={[styles.card, {backgroundColor: colors.card}]}>
+          <View style={[styles.imageHeader, {backgroundColor: colors.input}]}>
+            <Image
+              source={imageAssets.registerIcon}
+              style={styles.headerImage}
+            />
+          </View>
 
-          <AppInput
-            icon="👤"
-            label="Nombre"
-            placeholder="Paúl Terán"
-            value={name}
-            onChangeText={setName}
-            autoCapitalize="words"
-          />
-
-          <AppInput
-            icon="✉️"
-            label="Correo electrónico"
-            placeholder="tuemail@correo.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-          />
-
-          <AppInput
-            icon="🔒"
-            label="Contraseña"
-            placeholder="Mínimo 6 caracteres"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-
-          <AppInput
-            icon="✅"
-            label="Confirmar contraseña"
-            placeholder="Repite tu contraseña"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-
-          <AppButton
-            title="Crear cuenta"
-            onPress={handleRegister}
-            loading={loading}
-          />
-
-          <Pressable onPress={() => navigation.goBack()} style={styles.footer}>
-            <Text style={[styles.footerText, {color: colors.muted}]}>
-              ¿Ya tienes cuenta?{' '}
-              <Text style={{color: colors.brand, fontWeight: '800'}}>
-                Iniciar sesión
-              </Text>
+          <View style={styles.formContent}>
+            <Text style={[styles.title, {color: colors.title}]}>
+              Crea tu cuenta
             </Text>
-          </Pressable>
+
+            <Text style={[styles.subtitle, {color: colors.muted}]}>
+              Empieza tu bitácora personal y guarda tus experiencias favoritas.
+            </Text>
+
+            <AppInput
+              iconElement={
+                <FontAwesome name="user" size={18} color={colors.brand} />
+              }
+              label="Nombre *"
+              placeholder="John Doe"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+            />
+
+            <AppInput
+              iconElement={
+                <FontAwesome name="envelope" size={18} color={colors.brand} />
+              }
+              label="Correo electrónico *"
+              placeholder="tuemail@correo.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <AppInput
+              iconElement={
+                <FontAwesome name="lock" size={18} color={colors.brand} />
+              }
+              label="Contraseña *"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            <AppInput
+              iconElement={
+                <FontAwesome
+                  name="circle-check"
+                  size={18}
+                  color={colors.brand}
+                />
+              }
+              label="Confirmar contraseña *"
+              placeholder="Repite tu contraseña"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
+
+            <AppButton
+              title="Crear cuenta"
+              onPress={handleRegister}
+              loading={loading}
+            />
+
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={styles.footer}>
+              <Text style={[styles.footerText, {color: colors.muted}]}>
+                ¿Ya tienes cuenta?{' '}
+                <Text style={{color: colors.brand, fontWeight: '900'}}>
+                  Iniciar sesión
+                </Text>
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -143,18 +171,45 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 34,
-    padding: 22,
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 24,
     shadowOffset: {width: 0, height: 10},
     elevation: 5,
   },
+  imageHeader: {
+    width: '100%',
+    height: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerImage: {
+    width: '76%',
+    height: '76%',
+    resizeMode: 'contain',
+  },
+  formContent: {
+    padding: 22,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 24,
+  },
   footer: {
-    marginTop: 24,
+    marginTop: 22,
     alignItems: 'center',
   },
   footerText: {
     fontSize: 14,
+    textAlign: 'center',
   },
 });

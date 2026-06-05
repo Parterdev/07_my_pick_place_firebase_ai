@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -9,37 +10,39 @@ import {
   Text,
   View,
 } from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthStackParamList} from '../../types/navigation';
-import {AuthHeader} from '../../components/AuthHeader';
-import {AppInput} from '../../components/AppInput';
-import {AppButton} from '../../components/AppButton';
-import {useAuthContext} from '../../context/AuthContext';
-import {useAuthForm} from '../../hooks/useAuthForm';
-import {useThemeMode} from '../../hooks/useThemeMode';
-import {validateLoginForm, isValidEmail} from '../../utils/validators';
-import {formatFirebaseAuthError} from '../../utils/formatters';
-import {imageAssets} from '../../assets/images';
+import FontAwesome from '@react-native-vector-icons/fontawesome-free-solid';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AppButton } from '../../components/AppButton';
+import { AppInput } from '../../components/AppInput';
+import { imageAssets } from '../../assets/images';
+import { useAuthContext } from '../../context/AuthContext';
+import { useAuthForm } from '../../hooks/useAuthForm';
+import { useThemeMode } from '../../hooks/useThemeMode';
+import { AuthStackParamList } from '../../types/navigation';
+import { formatFirebaseAuthError } from '../../utils/formatters';
+import { validateLoginForm } from '../../utils/validators';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
-export const LoginScreen = ({navigation}: Props) => {
-  const {email, password, setEmail, setPassword} = useAuthForm();
-  const {login, forgotPassword} = useAuthContext();
-  const {colors} = useThemeMode();
+export const LoginScreen = ({ navigation }: Props) => {
+  const { colors } = useThemeMode();
+  const { login } = useAuthContext();
+
+  const { email, password, setEmail, setPassword } = useAuthForm();
+
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    const validationError = validateLoginForm(email, password);
+    const validationMessage = validateLoginForm(email, password);
 
-    if (validationError) {
-      Alert.alert('Validación', validationError);
+    if (validationMessage) {
+      Alert.alert('Validación', validationMessage);
       return;
     }
 
     try {
       setLoading(true);
-      await login(email, password);
+      await login(email.trim(), password);
     } catch (error: any) {
       Alert.alert('Inicio de sesión', formatFirebaseAuthError(error?.code));
     } finally {
@@ -47,82 +50,82 @@ export const LoginScreen = ({navigation}: Props) => {
     }
   };
 
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword');
   };
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, {backgroundColor: colors.background}]}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled">
-        <View style={[styles.card, {backgroundColor: colors.card}]}>
-          <AuthHeader
-            emoji="🧳"
-            title="Login to MyPickPlace"
-            subtitle="Accede para guardar tus lugares favoritos y descubrir nuevas experiencias."
-            imageSource={imageAssets.login}
-          />
-
-          <AppInput
-            icon="✉️"
-            label="Correo electrónico"
-            placeholder="tuemail@correo.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-          />
-
-          <AppInput
-            icon="🔒"
-            label="Contraseña"
-            placeholder="Ingresa tu contraseña"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-
-          <Pressable onPress={handleForgotPassword} style={styles.forgot}>
-            <Text style={[styles.forgotText, {color: colors.brand}]}>
-              ¿Olvidaste tu contraseña?
-            </Text>
-          </Pressable>
-
-          <AppButton
-            title="Iniciar sesión"
-            onPress={handleLogin}
-            loading={loading}
-          />
-
-          {/* <View style={styles.dividerRow}>
-            <View style={[styles.line, {backgroundColor: colors.border}]} />
-            <Text style={[styles.dividerText, {color: colors.muted}]}>
-              o continúa luego con
-            </Text>
-            <View style={[styles.line, {backgroundColor: colors.border}]} />
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <View style={[styles.imageHeader, { backgroundColor: colors.input }]}>
+            <Image
+              source={imageAssets.paperMapIcon}
+              style={styles.headerImage}
+            />
           </View>
 
-          <View style={styles.socialRow}>
-            <View style={[styles.socialButton, {borderColor: colors.border}]}>
-              <Text style={styles.socialIcon}>G</Text>
-            </View>
-            <View style={[styles.socialButton, {borderColor: colors.border}]}>
-              <Text style={styles.socialIcon}>f</Text>
-            </View>
-          </View> */}
-
-          <Pressable
-            onPress={() => navigation.navigate('Register')}
-            style={styles.footer}>
-            <Text style={[styles.footerText, {color: colors.muted}]}>
-              ¿No tienes cuenta?{' '}
-              <Text style={{color: colors.brand, fontWeight: '800'}}>
-                Crear cuenta
-              </Text>
+          <View style={styles.formContent}>
+            <Text style={[styles.title, { color: colors.title }]}>
+              Inicia sesión
             </Text>
-          </Pressable>
+
+            <Text style={[styles.subtitle, { color: colors.muted }]}>
+              Accede a tu galería personal y continúa guardando experiencias
+              memorables.
+            </Text>
+
+            <AppInput
+              iconElement={
+                <FontAwesome name="envelope" size={18} color={colors.brand} />
+              }
+              label="Correo electrónico *"
+              placeholder="tuemail@correo.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <AppInput
+              iconElement={
+                <FontAwesome name="lock" size={18} color={colors.brand} />
+              }
+              label="Contraseña *"
+              placeholder="Ingresa tu contraseña"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            <Pressable onPress={handleForgotPassword} style={styles.forgot}>
+              <Text style={[styles.forgotText, { color: colors.brand }]}>
+                ¿Olvidaste tu contraseña?
+              </Text>
+            </Pressable>
+
+            <AppButton
+              title="Entrar"
+              onPress={handleLogin}
+              loading={loading}
+            />
+
+            <Pressable
+              onPress={() => navigation.navigate('Register')}
+              style={styles.footer}>
+              <Text style={[styles.footerText, { color: colors.muted }]}>
+                ¿Aún no tienes cuenta?{' '}
+                <Text style={{ color: colors.brand, fontWeight: '900' }}>
+                  Crear cuenta
+                </Text>
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -139,50 +142,47 @@ const styles = StyleSheet.create({
     padding: 22,
   },
   card: {
-    borderRadius: 32,
-    padding: 22,
+    borderRadius: 34,
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 24,
-    shadowOffset: {width: 0, height: 10},
+    shadowOffset: { width: 0, height: 10 },
     elevation: 5,
   },
+  imageHeader: {
+    width: '100%',
+    height: 172,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerImage: {
+    width: '82%',
+    height: '82%',
+    resizeMode: 'contain',
+  },
+  formContent: {
+    padding: 22,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 24,
+  },
   forgot: {
-    alignSelf: 'flex-end',
-    marginBottom: 8,
+    alignItems: 'flex-end',
+    marginTop: -2,
+    marginBottom: 18,
   },
   forgotText: {
     fontSize: 13,
-    fontWeight: '700',
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 22,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    fontSize: 12,
-    marginHorizontal: 10,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 14,
-  },
-  socialButton: {
-    width: 54,
-    height: 44,
-    borderWidth: 1,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  socialIcon: {
-    fontSize: 18,
     fontWeight: '900',
   },
   footer: {
@@ -191,5 +191,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
+    textAlign: 'center',
   },
 });
