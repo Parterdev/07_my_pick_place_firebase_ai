@@ -21,6 +21,20 @@ export const imageAssets = {
   paperMapIcon: require('./paper_map_icon.png') as ImageSourcePropType,
   rightArrowIcon: require('./right_icon.png') as ImageSourcePropType,
   leftArrowIcon: require('./left_icon.png') as ImageSourcePropType,
+  synchronizeIcon: require('./synchronize_icon.png') as ImageSourcePropType,
+  toggleOnIcon: require('./toggle_on_icon.png') as ImageSourcePropType,
+  toggleOffIcon: require('./toggle_off_icon.png') as ImageSourcePropType,
+  catIcon: require('./cat_icon.png') as ImageSourcePropType,
+  bearIcon: require('./bear_icon.png') as ImageSourcePropType,
+  octopusIcon: require('./octopus_icon.png') as ImageSourcePropType,
+  dogIcon: require('./dog_icon.png') as ImageSourcePropType,
+  elephantIcon: require('./elephant_icon.png') as ImageSourcePropType,
+  rabbitIcon: require('./rabbit_icon.png') as ImageSourcePropType,
+  butterflyIcon: require('./butterfly_icon.png') as ImageSourcePropType,
+  fireIcon: require('./fire_icon.png') as ImageSourcePropType,
+  cloudIcon: require('./cloud_icon.png') as ImageSourcePropType,
+  recoverIcon: require('./recover_email_icon.png') as ImageSourcePropType,
+  botIcon: require('./bot_icon.png') as ImageSourcePropType,
 };
 
 export const svgAssets = {

@@ -2,23 +2,25 @@ import React from 'react';
 import {
   Image,
   Linking,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {AppButton} from '../../components/AppButton';
-import {useThemeMode} from '../../hooks/useThemeMode';
-import {GalleryStackParamList} from '../../types/navigation';
-import {formatCoordinate, formatPlaceDate} from '../../utils/formatters';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppButton } from '../../components/AppButton';
+import { imageAssets } from '../../assets/images';
+import { useThemeMode } from '../../hooks/useThemeMode';
+import { GalleryStackParamList } from '../../types/navigation';
+import { formatCoordinate, formatPlaceDate } from '../../utils/formatters';
 
 type Props = NativeStackScreenProps<GalleryStackParamList, 'PlaceDetail'>;
 
-export const PlaceDetailScreen = ({route, navigation}: Props) => {
-  const {colors} = useThemeMode();
-  const {place} = route.params;
+export const PlaceDetailScreen = ({ route, navigation }: Props) => {
+  const { colors } = useThemeMode();
+  const { place } = route.params;
 
   const openInGoogleMaps = async () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
@@ -28,37 +30,42 @@ export const PlaceDetailScreen = ({route, navigation}: Props) => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, {backgroundColor: colors.background}]}>
+      style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
-        <AppButton
-          title="← Volver a galería"
+        <Pressable
           onPress={() => navigation.goBack()}
-          variant="ghost"
-          style={styles.backButton}
-          textStyle={styles.backButtonText}
-        />
+          hitSlop={12}
+          style={({ pressed }) => [
+            styles.backIconButton,
+            {
+              backgroundColor: colors.card,
+              opacity: pressed ? 0.75 : 1,
+            },
+          ]}>
+          <Image source={imageAssets.leftArrowIcon} style={styles.backIcon} />
+        </Pressable>
 
-        <View style={[styles.card, {backgroundColor: colors.card}]}>
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           {place.imageUrl ? (
-            <Image source={{uri: place.imageUrl}} style={styles.image} />
+            <Image source={{ uri: place.imageUrl }} style={styles.image} />
           ) : (
-            <View style={[styles.emptyImage, {backgroundColor: colors.input}]}>
+            <View style={[styles.emptyImage, { backgroundColor: colors.input }]}>
               <Text style={styles.emptyImageEmoji}>🖼️</Text>
             </View>
           )}
 
           <View style={styles.body}>
-            <Text style={[styles.kicker, {color: colors.brand}]}>
+            <Text style={[styles.kicker, { color: colors.brand }]}>
               Detalle de experiencia
             </Text>
 
-            <Text style={[styles.title, {color: colors.title}]}>
+            <Text style={[styles.title, { color: colors.title }]}>
               {place.title}
             </Text>
 
-            <Text style={[styles.description, {color: colors.muted}]}>
+            <Text style={[styles.description, { color: colors.muted }]}>
               {place.description}
             </Text>
 
@@ -70,15 +77,15 @@ export const PlaceDetailScreen = ({route, navigation}: Props) => {
                   borderColor: colors.border,
                 },
               ]}>
-              <Text style={[styles.infoTitle, {color: colors.title}]}>
+              <Text style={[styles.infoTitle, { color: colors.title }]}>
                 Ubicación registrada
               </Text>
 
-              <Text style={[styles.infoText, {color: colors.muted}]}>
+              <Text style={[styles.infoText, { color: colors.muted }]}>
                 Latitud: {formatCoordinate(place.latitude)}
               </Text>
 
-              <Text style={[styles.infoText, {color: colors.muted}]}>
+              <Text style={[styles.infoText, { color: colors.muted }]}>
                 Longitud: {formatCoordinate(place.longitude)}
               </Text>
             </View>
@@ -91,11 +98,11 @@ export const PlaceDetailScreen = ({route, navigation}: Props) => {
                   borderColor: colors.border,
                 },
               ]}>
-              <Text style={[styles.infoTitle, {color: colors.title}]}>
+              <Text style={[styles.infoTitle, { color: colors.title }]}>
                 Fecha de registro
               </Text>
 
-              <Text style={[styles.infoText, {color: colors.muted}]}>
+              <Text style={[styles.infoText, { color: colors.muted }]}>
                 {formatPlaceDate(place.createdAt)}
               </Text>
             </View>
@@ -114,13 +121,13 @@ export const PlaceDetailScreen = ({route, navigation}: Props) => {
                   borderColor: colors.border,
                 },
               ]}>
-              <Text style={styles.aiEmoji}>✨</Text>
+              <Image source={imageAssets.botIcon} style={styles.aiImage} />
 
-              <Text style={[styles.aiTitle, {color: colors.title}]}>
+              <Text style={[styles.aiTitle, { color: colors.title }]}>
                 Recomendaciones con IA
               </Text>
 
-              <Text style={[styles.aiText, {color: colors.muted}]}>
+              <Text style={[styles.aiText, { color: colors.muted }]}>
                 En la siguiente etapa, esta sección mostrará sugerencias de
                 lugares similares, descripciones inteligentes y recomendaciones
                 basadas en la experiencia guardada.
@@ -198,9 +205,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: 'center',
   },
-  aiEmoji: {
-    fontSize: 40,
-  },
   aiTitle: {
     fontSize: 18,
     fontWeight: '900',
@@ -212,13 +216,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginTop: 0,
-    marginBottom: 14,
+  backIconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
   },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '900',
+  backIcon: {
+    width: 26,
+    height: 26,
+    resizeMode: 'contain',
+  },
+  aiImage: {
+    width: 86,
+    height: 86,
+    resizeMode: 'contain',
   },
 });

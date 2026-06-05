@@ -1,9 +1,10 @@
 import React from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import FontAwesome from '@react-native-vector-icons/fontawesome-free-solid';
 import CloseIcon from '../assets/images/close_icon.svg';
-import {useThemeMode} from '../hooks/useThemeMode';
-import {PlaceExperience} from '../types/place';
-import {formatCoordinate, formatPlaceDate} from '../utils/formatters';
+import { useThemeMode } from '../hooks/useThemeMode';
+import { PlaceExperience } from '../types/place';
+import { formatCoordinate, formatPlaceDate } from '../utils/formatters';
 
 interface PlaceCardProps {
   place: PlaceExperience;
@@ -11,8 +12,8 @@ interface PlaceCardProps {
   onDeletePress?: () => void;
 }
 
-export const PlaceCard = ({place, onPress, onDeletePress}: PlaceCardProps) => {
-  const {colors} = useThemeMode();
+export const PlaceCard = ({ place, onPress, onDeletePress }: PlaceCardProps) => {
+  const { colors } = useThemeMode();
 
   if (!place) {
     return null;
@@ -21,7 +22,7 @@ export const PlaceCard = ({place, onPress, onDeletePress}: PlaceCardProps) => {
   return (
     <Pressable
       onPress={onPress}
-      style={({pressed}) => [
+      style={({ pressed }) => [
         styles.card,
         {
           backgroundColor: colors.card,
@@ -31,7 +32,7 @@ export const PlaceCard = ({place, onPress, onDeletePress}: PlaceCardProps) => {
       <Pressable
         onPress={onDeletePress}
         hitSlop={10}
-        style={({pressed}) => [
+        style={({ pressed }) => [
           styles.deleteButton,
           {
             backgroundColor: colors.card,
@@ -42,20 +43,20 @@ export const PlaceCard = ({place, onPress, onDeletePress}: PlaceCardProps) => {
       </Pressable>
 
       {place.imageUrl ? (
-        <Image source={{uri: place.imageUrl}} style={styles.image} />
+        <Image source={{ uri: place.imageUrl }} style={styles.image} />
       ) : (
-        <View style={[styles.emptyImage, {backgroundColor: colors.input}]}>
+        <View style={[styles.emptyImage, { backgroundColor: colors.input }]}>
           <Text style={styles.emptyImageEmoji}>🖼️</Text>
         </View>
       )}
 
       <View style={styles.content}>
-        <Text style={[styles.title, {color: colors.title}]} numberOfLines={1}>
+        <Text style={[styles.title, { color: colors.title }]} numberOfLines={1}>
           {place.title || 'Lugar sin nombre'}
         </Text>
 
         <Text
-          style={[styles.description, {color: colors.muted}]}
+          style={[styles.description, { color: colors.muted }]}
           numberOfLines={2}>
           {place.description || 'Sin descripción registrada.'}
         </Text>
@@ -68,15 +69,32 @@ export const PlaceCard = ({place, onPress, onDeletePress}: PlaceCardProps) => {
               borderColor: colors.border,
             },
           ]}>
-          <Text style={[styles.locationText, {color: colors.muted}]}>
-            📍 {formatCoordinate(place.latitude)},{' '}
-            {formatCoordinate(place.longitude)}
-          </Text>
+          <View style={styles.inlineInfoRow}>
+            <FontAwesome
+              name="location-dot"
+              size={14}
+              color={colors.brand}
+              style={styles.inlineIcon}
+            />
+
+            <Text style={[styles.locationText, { color: colors.muted }]}>
+              {formatCoordinate(place.latitude)}, {formatCoordinate(place.longitude)}
+            </Text>
+          </View>
         </View>
 
-        <Text style={[styles.date, {color: colors.muted}]}>
-          🕒 {formatPlaceDate(place.createdAt)}
-        </Text>
+        <View style={styles.dateRow}>
+          <FontAwesome
+            name="clock"
+            size={13}
+            color={colors.brand}
+            style={styles.inlineIcon}
+          />
+
+          <Text style={[styles.date, { color: colors.muted }]}>
+            {formatPlaceDate(place.createdAt)}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -103,7 +121,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.16,
     shadowRadius: 8,
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
   },
   image: {
     width: '100%',
@@ -143,6 +161,17 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 12,
+  },
+  inlineInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 10,
+  },
+  inlineIcon: {
+    marginRight: 7,
   },
 });
