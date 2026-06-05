@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,7 +15,7 @@ import { AppButton } from '../../components/AppButton';
 import { useAuthContext } from '../../context/AuthContext';
 import { useThemeMode } from '../../hooks/useThemeMode';
 import { listUserPlaceExperiences } from '../../services/places.service';
-import {imageAssets} from '../../assets/images';
+import { imageAssets } from '../../assets/images';
 
 export const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuthContext();
@@ -135,19 +136,29 @@ export const HomeScreen = ({ navigation }: any) => {
           </View>
 
           <View style={[styles.metricCard, { backgroundColor: colors.card }]}>
-            <View style={[styles.metricIconBox, { backgroundColor: colors.input }]}>
-              <FontAwesome
-                name="wand-magic-sparkles"
-                size={25}
-                color={colors.brand}
-              />
-            </View>
+            <Pressable
+              onPress={() => navigation.navigate('BehaviorSummary')}
+              style={({ pressed }) => [
+                styles.metricCard,
+                {
+                  backgroundColor: colors.card,
+                  opacity: pressed ? 0.84 : 1,
+                },
+              ]}>
+              <View style={[styles.metricIconBox, { backgroundColor: colors.input }]}>
+                <FontAwesome
+                  name="wand-magic-sparkles"
+                  size={25}
+                  color={colors.brand}
+                />
+              </View>
 
-            <Text style={[styles.metricValue, { color: colors.title }]}>IA</Text>
+              <Text style={[styles.metricValue, { color: colors.title }]}>IA</Text>
 
-            <Text style={[styles.metricLabel, { color: colors.muted }]}>
-              Próximo
-            </Text>
+              <Text style={[styles.metricLabel, { color: colors.muted }]}>
+                Perfil de exploración
+              </Text>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -264,6 +275,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   metricLabel: {
+    justifyContent: 'center',
+    alignItems: 'center',
     fontSize: 13,
     marginTop: 2,
   },

@@ -19,4 +19,5 @@ export type AppTabParamList = {
   CapturePlace: undefined;
   Gallery: NavigatorScreenParams<GalleryStackParamList> | undefined;
   Profile: undefined;
+  BehaviorSummary: undefined;
 };

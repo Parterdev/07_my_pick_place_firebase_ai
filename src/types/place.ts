@@ -65,3 +65,29 @@ export interface GooglePlaceMetadata {
   googlePlaceCategory?: string;
   googlePlaceAddress?: string;
 }
+
+export interface UserBehaviorSummary {
+  id?: string;
+  userId: string;
+  placesCount: number;
+  profileTitle: string;
+  personalityType: string;
+  summary: string;
+  strengths: string[];
+  patterns: string[];
+  recommendation: string;
+  generatedAt?: any;
+  provider: 'gemini';
+}
+
+export interface BehaviorPlaceInput {
+  title: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  createdAt?: any;
+  googlePlaceName?: string;
+  googlePlaceRating?: number;
+  googlePlaceCategory?: string;
+  googlePlaceAddress?: string;
+}

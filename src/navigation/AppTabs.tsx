@@ -5,6 +5,7 @@ import {AppTabParamList} from '../types/navigation';
 import {HomeScreen} from '../screens/app/HomeScreen';
 import {CapturePlaceScreen} from '../screens/app/CapturePlaceScreen';
 import {ProfileScreen} from '../screens/app/ProfileScreen';
+import {BehaviorSummaryScreen} from '../screens/app/BehaviorSummaryScreen';
 import {useThemeMode} from '../hooks/useThemeMode';
 import {GalleryNavigator} from './GalleryNavigator';
 import {imageAssets, svgAssets} from '../assets/images';
@@ -111,6 +112,18 @@ export const AppTabs = () => {
           tabBarIcon: ({focused}) => (
             <PngTabIcon source={imageAssets.settingIcon} focused={focused} />
           ),
+        }}
+      />
+
+      <Tab.Screen
+        name="BehaviorSummary"
+        component={BehaviorSummaryScreen}
+        options={{
+          title: 'Comportamiento',
+          tabBarButton: () => null,
+          tabBarItemStyle: {
+            display: 'none',
+          },
         }}
       />
     </Tab.Navigator>

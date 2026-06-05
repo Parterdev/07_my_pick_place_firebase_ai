@@ -1,10 +1,12 @@
-import {Timestamp} from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import {
   PlaceAIInsights,
   PlaceExperience,
   RecommendedPlace,
+  BehaviorPlaceInput,
+  UserBehaviorSummary,
 } from '../types/place';
-import {GEMINI_CONFIG} from '../config/gemini';
+import { GEMINI_CONFIG } from '../config/gemini';
 
 interface GeminiFullInsightsResponse {
   summary: string;
@@ -36,15 +38,15 @@ Latitud ${place.latitude}, Longitud ${place.longitude}
 
 Google Places encontró estos sitios cercanos:
 ${recommendations
-  .map(
-    (item, index) => `
+      .map(
+        (item, index) => `
 ${index + 1}. ${item.name}
 Categoría: ${item.category}
 Dirección o referencia: ${item.address || item.description}
 Rating: ${item.rating || 'No disponible'}
 `,
-  )
-  .join('\n')}
+      )
+      .join('\n')}
 
 Tu tarea:
 Genera un análisis inteligente de la experiencia guardada y descripciones personalizadas para cada sitio recomendado.
@@ -227,4 +229,191 @@ export const generateInsightsWithGemini = async (
   });
 
   return insights;
+};
+
+interface GeminiBehaviorResponse {
+  profileTitle: string;
+  personalityType: string;
+  summary: string;
+  strengths: string[];
+  patterns: string[];
+  recommendation: string;
+}
+
+const buildBehaviorSummaryPrompt = (
+  places: BehaviorPlaceInput[],
+): string => {
+  return `
+Eres un analista de comportamiento visual para una app móvil llamada MyPickPlace.
+
+El usuario ha guardado estos lugares:
+
+${places
+      .map(
+        (place, index) => `
+${index + 1}. ${place.title}
+Descripción: ${place.description}
+Referencia Google: ${place.googlePlaceName || 'No disponible'}
+Categoría Google: ${place.googlePlaceCategory || 'No disponible'}
+Rating Google: ${place.googlePlaceRating || 'No disponible'}
+Dirección Google: ${place.googlePlaceAddress || 'No disponible'}
+Coordenadas: Latitud ${place.latitude}, Longitud ${place.longitude}
+Fecha/hora de guardado: ${place.createdAt || 'No disponible'}
+`,
+      )
+      .join('\n')}
+
+Tu tarea:
+Genera un resumen de personalidad fotográfica basado en los lugares guardados por el usuario.
+
+Debes interpretar:
+- qué tipo de lugares suele guardar
+- qué intereses visuales o emocionales aparecen
+- si prefiere cultura, naturaleza, ciudad, comida, memoria personal, exploración o espacios sociales
+- qué dice esto sobre su forma de capturar experiencias
+- qué podría explorar después
+
+Reglas:
+- Responde únicamente en JSON válido.
+- No uses markdown.
+- No agregues texto fuera del JSON.
+- El tono debe ser cálido, inteligente y breve.
+- No inventes datos que no estén sugeridos por los lugares.
+- profileTitle debe sonar como alias de personalidad visual.
+- personalityType debe ser una frase corta.
+- summary máximo 70 palabras.
+- strengths debe tener exactamente 3 elementos.
+- patterns debe tener exactamente 3 elementos.
+- recommendation máximo 35 palabras.
+
+Formato exacto:
+{
+  "profileTitle": "Explorador urbano sensible",
+  "personalityType": "Curioso cultural",
+  "summary": "Resumen breve del comportamiento fotográfico.",
+  "strengths": ["fortaleza uno", "fortaleza dos", "fortaleza tres"],
+  "patterns": ["patrón uno", "patrón dos", "patrón tres"],
+  "recommendation": "Sugerencia breve para próximas capturas."
+}
+`;
+};
+
+const parseGeminiBehaviorSummary = (
+  rawText: string,
+): GeminiBehaviorResponse | null => {
+  try {
+    return JSON.parse(cleanJsonText(rawText));
+  } catch (error) {
+    console.error('[Gemini] No se pudo parsear resumen de comportamiento:', {
+      rawText,
+      error,
+    });
+
+    return null;
+  }
+};
+
+const normalizeList = (
+  values: string[] | undefined,
+  fallback: string[],
+): string[] => {
+  if (!Array.isArray(values)) {
+    return fallback;
+  }
+
+  const cleanValues = values.map(item => item.trim()).filter(Boolean).slice(0, 3);
+
+  while (cleanValues.length < 3) {
+    cleanValues.push(fallback[cleanValues.length] || 'Patrón por descubrir');
+  }
+
+  return cleanValues;
+};
+
+export const generateBehaviorSummaryWithGemini = async ({
+  userId,
+  places,
+}: {
+  userId: string;
+  places: BehaviorPlaceInput[];
+}): Promise<UserBehaviorSummary> => {
+  if (!GEMINI_CONFIG.API_KEY) {
+    throw new Error('Gemini API Key no configurada.');
+  }
+
+  console.log('[Gemini] Generando resumen de comportamiento:', {
+    userId,
+    placesCount: places.length,
+  });
+
+  const response = await fetch(
+    `${GEMINI_CONFIG.BASE_URL}?key=${GEMINI_CONFIG.API_KEY}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: buildBehaviorSummaryPrompt(places),
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.55,
+          maxOutputTokens: 850,
+          responseMimeType: 'application/json',
+        },
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    console.error('[Gemini] Error generando comportamiento:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+    });
+
+    throw new Error('No se pudo generar el resumen de comportamiento.');
+  }
+
+  const data = await response.json();
+  const outputText = extractGeminiText(data);
+  const parsed = parseGeminiBehaviorSummary(outputText);
+
+  if (
+    !parsed?.profileTitle ||
+    !parsed?.personalityType ||
+    !parsed?.summary ||
+    !parsed?.recommendation ||
+    !Array.isArray(parsed.strengths) ||
+    parsed.strengths.length !== 3 ||
+    !Array.isArray(parsed.patterns) ||
+    parsed.patterns.length !== 3
+  ) {
+    throw new Error('La respuesta de Gemini no contiene un resumen válido.');
+  }
+
+  const summary: UserBehaviorSummary = {
+    userId,
+    placesCount: places.length,
+    profileTitle: parsed.profileTitle,
+    personalityType: parsed.personalityType,
+    summary: parsed.summary,
+    strengths: parsed.strengths.map(item => item.trim()).filter(Boolean),
+    patterns: parsed.patterns.map(item => item.trim()).filter(Boolean),
+    recommendation: parsed.recommendation,
+    provider: 'gemini',
+  };
+
+  console.log('[Gemini] Resumen de comportamiento generado:', summary);
+
+  return summary;
 };
