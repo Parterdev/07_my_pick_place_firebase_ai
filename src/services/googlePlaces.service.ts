@@ -100,6 +100,14 @@ const translateGoogleType = (type?: string): string => {
       return 'Sitio histórico';
     case 'museum':
       return 'Museo';
+    case 'art_museum':
+      return 'Museo de arte';
+    case 'cultural_center':
+      return 'Centro cultural';
+    case 'government_office':
+      return 'Oficina gubernamental';
+    case 'city_hall':
+      return 'Municipio';
     case 'park':
       return 'Parque';
     case 'restaurant':

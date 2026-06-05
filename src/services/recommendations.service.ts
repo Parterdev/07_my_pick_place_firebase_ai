@@ -1,7 +1,7 @@
 import {FEATURES} from '../config/features';
 import {PlaceAIInsights, PlaceExperience} from '../types/place';
 import {generateMockPlaceInsights} from './ai.service';
-import {enrichRecommendationsWithChatGPT} from './chatgpt.service';
+import {generateInsightsWithGemini} from './gemini.service';
 import {searchNearbyPlaces} from './googlePlaces.service';
 
 export const generatePlaceRecommendations = async (
@@ -9,7 +9,8 @@ export const generatePlaceRecommendations = async (
 ): Promise<PlaceAIInsights> => {
   const mockInsights = await generateMockPlaceInsights(place);
 
-  if (!FEATURES.USE_GOOGLE_PLACES) {
+  if (FEATURES.RECOMMENDATION_MODE === 'mock') {
+    console.log('[Recommendations] Modo mock activo.');
     return mockInsights;
   }
 
@@ -21,23 +22,25 @@ export const generatePlaceRecommendations = async (
       originalPlaceName: place.title,
     });
 
-    let finalRecommendations =
+    const finalRecommendations =
       nearbyPlaces.length > 0 ? nearbyPlaces : mockInsights.recommendations;
 
-    if (FEATURES.USE_CHATGPT && nearbyPlaces.length > 0) {
-      finalRecommendations = await enrichRecommendationsWithChatGPT(
-        place,
-        finalRecommendations,
-      );
+    if (FEATURES.RECOMMENDATION_MODE === 'gemini') {
+      console.log('[Recommendations] Modo real activo. Usando Google Places + Gemini.');
+
+      return await generateInsightsWithGemini(place, finalRecommendations);
     }
+
+    console.log('[Recommendations] Modo Google Places activo sin Gemini.');
 
     return {
       ...mockInsights,
       recommendations: finalRecommendations,
-      provider: FEATURES.USE_CHATGPT ? 'chatgpt' : 'mock',
+      provider: 'mock',
     };
   } catch (error) {
     console.error('[Recommendations] Error generando recomendaciones:', error);
+    console.log('[Recommendations] Aplicando fallback mock.');
 
     return mockInsights;
   }

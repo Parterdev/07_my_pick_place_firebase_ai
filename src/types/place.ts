@@ -27,7 +27,7 @@ export interface PlaceAIInsights {
   tags: string[];
   recommendations: RecommendedPlace[];
   generatedAt?: Timestamp | null;
-  provider?: 'chatgpt' | 'mock';
+  provider?: 'gemini' | 'chatgpt' | 'mock';
 }
 
 export interface PlaceExperience {

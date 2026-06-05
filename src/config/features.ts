@@ -1,5 +1,5 @@
+export type RecommendationMode = 'mock' | 'google' | 'gemini';
+
 export const FEATURES = {
-  USE_AI_MOCK: true,
-  USE_GOOGLE_PLACES: true,
-  USE_CHATGPT: false,
+  RECOMMENDATION_MODE: 'mock' as RecommendationMode,
 };
