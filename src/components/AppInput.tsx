@@ -1,24 +1,35 @@
 import React from 'react';
 import {
   StyleSheet,
+  Text,
   TextInput,
   TextInputProps,
   View,
-  Text,
 } from 'react-native';
 import {useThemeMode} from '../hooks/useThemeMode';
 
 interface AppInputProps extends TextInputProps {
   label?: string;
   icon?: string;
+  iconElement?: React.ReactNode;
 }
 
-export const AppInput = ({label, icon, style, ...props}: AppInputProps) => {
+export const AppInput = ({
+  label,
+  icon,
+  iconElement,
+  style,
+  ...props
+}: AppInputProps) => {
   const {colors} = useThemeMode();
 
   return (
     <View style={styles.wrapper}>
-      {label ? <Text style={[styles.label, {color: colors.muted}]}>{label}</Text> : null}
+      {label ? (
+        <Text style={[styles.label, {color: colors.muted}]}>
+          {label}
+        </Text>
+      ) : null}
 
       <View
         style={[
@@ -28,7 +39,11 @@ export const AppInput = ({label, icon, style, ...props}: AppInputProps) => {
             borderColor: colors.border,
           },
         ]}>
-        {icon ? <Text style={styles.icon}>{icon}</Text> : null}
+        {iconElement ? (
+          <View style={styles.iconElement}>{iconElement}</View>
+        ) : icon ? (
+          <Text style={styles.icon}>{icon}</Text>
+        ) : null}
 
         <TextInput
           placeholderTextColor={colors.muted}
@@ -49,7 +64,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     marginBottom: 6,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   container: {
     minHeight: 52,
@@ -62,6 +77,12 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 18,
     marginRight: 10,
+  },
+  iconElement: {
+    width: 28,
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: {
     flex: 1,

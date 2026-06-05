@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import LottieView from 'lottie-react-native';
 import {
   Alert,
   Image,
   Keyboard,
   Modal,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import LottieView from 'lottie-react-native';
 import { Asset } from 'react-native-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppButton } from '../../components/AppButton';
 import { AppInput } from '../../components/AppInput';
+import { imageAssets, svgAssets } from '../../assets/images';
 import { useAuthContext } from '../../context/AuthContext';
 import { useThemeMode } from '../../hooks/useThemeMode';
 import { createPlaceExperience } from '../../services/places.service';
@@ -24,10 +26,11 @@ import {
   requestCameraPermission,
   requestLocationPermission,
 } from '../../utils/permissions';
-import {svgAssets} from '../../assets/images';
+import FontAwesome from '@react-native-vector-icons/fontawesome-free-solid';
 
 const confettiAnimation = require('../../assets/lotties/ConfettiAnimation.json');
 const DoneIcon = svgAssets.doneIcon;
+const CloseIcon = svgAssets.closeIcon;
 
 export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
   const { colors } = useThemeMode();
@@ -170,6 +173,10 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
     });
   };
 
+  const handleRemovePhoto = () => {
+    setPhoto(null);
+  };
+
   return (
     <SafeAreaView
       edges={['top']}
@@ -178,21 +185,23 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled">
         <View style={[styles.headerCard, { backgroundColor: colors.card }]}>
-          <Text style={styles.emoji}>📸📍</Text>
+          <Image source={imageAssets.capturePlaceIcon} style={styles.headerImage} />
 
           <Text style={[styles.title, { color: colors.title }]}>
-            Captura de lugar
+            Nueva experiencia
           </Text>
 
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Registra una experiencia con fotografía, descripción y ubicación GPS.
+            Guarda el sitio, su historia breve y la ubicación donde ocurrió.
           </Text>
         </View>
 
         <View style={[styles.formCard, { backgroundColor: colors.card }]}>
           <AppInput
-            icon="🏷️"
-            label="Nombre del lugar"
+            iconElement={
+              <FontAwesome name="tag" size={18} color={colors.brand} />
+            }
+            label="*Nombre del lugar"
             placeholder="Ej. Parque La Carolina"
             value={title}
             onChangeText={setTitle}
@@ -200,8 +209,10 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
           />
 
           <AppInput
-            icon="📝"
-            label="Descripción"
+            iconElement={
+              <FontAwesome name="pen-to-square" size={18} color={colors.brand} />
+            }
+            label="*Descripción"
             placeholder="Describe brevemente tu experiencia"
             value={description}
             onChangeText={setDescription}
@@ -211,30 +222,55 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
 
           <View style={styles.previewContainer}>
             {photo?.uri ? (
-              <Image source={{ uri: photo.uri }} style={styles.previewImage} />
+              <View style={styles.photoWrapper}>
+                <Pressable onPress={handleTakePhoto} disabled={loadingPhoto}>
+                  <Image source={{ uri: photo.uri }} style={styles.previewImage} />
+
+                  <View style={styles.changePhotoBadge}>
+                    <Text style={styles.changePhotoText}>Cambiar foto</Text>
+                  </View>
+                </Pressable>
+
+                <Pressable
+                  onPress={handleRemovePhoto}
+                  hitSlop={10}
+                  style={({ pressed }) => [
+                    styles.removePhotoButton,
+                    {
+                      backgroundColor: colors.card,
+                      opacity: pressed ? 0.75 : 1,
+                    },
+                  ]}>
+                  <CloseIcon width={28} height={28} />
+                </Pressable>
+              </View>
             ) : (
-              <View
-                style={[
+              <Pressable
+                onPress={handleTakePhoto}
+                disabled={loadingPhoto}
+                style={({ pressed }) => [
                   styles.emptyPreview,
                   {
                     backgroundColor: colors.input,
                     borderColor: colors.border,
+                    opacity: pressed || loadingPhoto ? 0.75 : 1,
                   },
                 ]}>
-                <Text style={styles.previewEmoji}>🖼️</Text>
-                <Text style={[styles.previewText, { color: colors.muted }]}>
-                  Aún no has capturado una foto
+                <Image
+                  source={imageAssets.pickupPointIcon}
+                  style={styles.previewImageIcon}
+                />
+
+                <Text style={[styles.previewTitle, { color: colors.title }]}>
+                  Añadir fotografía
                 </Text>
-              </View>
+
+                <Text style={[styles.previewText, { color: colors.muted }]}>
+                  Toca aquí para abrir la cámara y registrar este momento.
+                </Text>
+              </Pressable>
             )}
           </View>
-
-          <AppButton
-            title={photo ? 'Cambiar fotografía' : 'Tomar fotografía'}
-            onPress={handleTakePhoto}
-            loading={loadingPhoto}
-            variant="secondary"
-          />
 
           <View
             style={[
@@ -245,7 +281,7 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
               },
             ]}>
             <Text style={[styles.locationTitle, { color: colors.text }]}>
-              Ubicación GPS
+              *Ubicación GPS
             </Text>
 
             {location ? (
@@ -259,7 +295,7 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
               </>
             ) : (
               <Text style={[styles.locationText, { color: colors.muted }]}>
-                Aún no se ha obtenido la ubicación.
+                Obtén las coordenadas para asociar esta experiencia a un punto real.
               </Text>
             )}
           </View>
@@ -327,9 +363,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 18,
   },
-  emoji: {
-    fontSize: 58,
-  },
   title: {
     fontSize: 25,
     fontWeight: '900',
@@ -368,10 +401,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  previewEmoji: {
-    fontSize: 42,
-  },
   previewText: {
+    padding: 16,
     marginTop: 8,
     fontSize: 14,
   },
@@ -411,12 +442,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   successText: {
-  fontSize: 15,
-  lineHeight: 22,
-  textAlign: 'center',
-  marginTop: 10,
-  marginBottom: 16,
-},
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 16,
+  },
   successIconWrapper: {
     width: 190,
     height: 190,
@@ -429,4 +460,53 @@ const styles = StyleSheet.create({
     width: 210,
     height: 210,
   },
+  headerImage: {
+    width: 124,
+    height: 124,
+    resizeMode: 'contain',
+    marginBottom: 12,
+  },
+  previewImageIcon: {
+    width: 96,
+    height: 96,
+    resizeMode: 'contain',
+    marginBottom: 12,
+  },
+  previewTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  changePhotoBadge: {
+    position: 'absolute',
+    right: 14,
+    bottom: 14,
+    backgroundColor: 'rgba(0, 0, 0, 0.68)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  changePhotoText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  photoWrapper: {
+    position: 'relative',
+  },
+  removePhotoButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+  }
 });
