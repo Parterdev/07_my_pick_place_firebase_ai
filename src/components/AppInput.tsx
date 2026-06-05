@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import {useThemeMode} from '../hooks/useThemeMode';
+import { typography } from '../theme/typography';
 
 interface AppInputProps extends TextInputProps {
   label?: string;
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     marginBottom: 6,
-    fontWeight: '700',
+    fontFamily: typography.fontFamily.bold,
   },
   container: {
     minHeight: 52,
@@ -87,5 +88,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
   },
 });

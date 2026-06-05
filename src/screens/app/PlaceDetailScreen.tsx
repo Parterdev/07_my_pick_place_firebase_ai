@@ -22,6 +22,7 @@ import {
   resolvePlaceGoogleMetadata,
   savePlaceAIInsights,
 } from '../../services/places.service';
+import { typography } from '../../theme/typography';
 
 type Props = NativeStackScreenProps<GalleryStackParamList, 'PlaceDetail'>;
 
@@ -189,7 +190,7 @@ export const PlaceDetailScreen = ({ route, navigation }: Props) => {
             </View>
 
             {googleMetadata?.googlePlaceName ? (
-              <Text style={[styles.description, { color: colors.brand, fontWeight: 'bold' }]}>
+              <Text style={[styles.description, { color: colors.brand, fontFamily: typography.fontFamily.black }]}>
                 Referencia Google:
                 <Text style={{ color: colors.muted }}>
                   {' ' + googleMetadata.googlePlaceName}
@@ -470,11 +471,12 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 30,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 8,
   },
   description: {
     fontSize: 16,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 24,
     marginTop: 10,
   },
@@ -486,11 +488,12 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 15,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginBottom: 8,
   },
   infoText: {
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
     marginTop: 3,
   },
   aiBox: {
@@ -502,11 +505,12 @@ const styles = StyleSheet.create({
   },
   aiTitle: {
     fontSize: 18,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 10,
   },
   aiText: {
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 21,
     textAlign: 'center',
     marginTop: 8,
@@ -522,7 +526,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
   },
   backIcon: {
     width: 26,
@@ -544,12 +548,13 @@ const styles = StyleSheet.create({
   },
   aiSectionLabel: {
     fontSize: 12,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   aiSummaryText: {
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 21,
   },
   aiMetaRow: {
@@ -561,7 +566,7 @@ const styles = StyleSheet.create({
   },
   aiMetaText: {
     fontSize: 16,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   tagsContainer: {
     flexDirection: 'row',
@@ -577,11 +582,11 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   recommendationTitle: {
     fontSize: 20,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 22,
     marginBottom: 12,
   },
@@ -606,25 +611,26 @@ const styles = StyleSheet.create({
   },
   recommendationName: {
     fontSize: 15,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   recommendationCategory: {
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.extraBold,
     marginTop: 2,
   },
   ratingText: {
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.extraBold,
   },
   recommendationDescription: {
     fontSize: 13,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 20,
     marginTop: 10,
   },
   openMapHint: {
     fontSize: 12,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 10,
   },
   titleRow: {
@@ -650,11 +656,11 @@ const styles = StyleSheet.create({
   },
   ratingValue: {
     fontSize: 13,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   googleReferenceText: {
     fontSize: 13,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginBottom: 8,
   },
   shareButton: {
@@ -671,7 +677,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.16,
     shadowRadius: 12,
-    shadowOffset: { width: 0, height: 5 },
+    shadowOffset: {width: 0, height: 5},
   },
   shareIcon: {
     width: 30,

@@ -17,6 +17,7 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useThemeMode } from '../../hooks/useThemeMode';
 import { listUserPlaceExperiences } from '../../services/places.service';
 import { imageAssets } from '../../assets/images';
+import {typography} from '../../theme/typography';
 
 export const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuthContext();
@@ -201,8 +202,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   kicker: {
-    fontSize: 14,
-    fontWeight: '900',
+    fontSize: 20,
+    fontFamily: typography.fontFamily.black,
     marginTop: 10,
   },
   greetingRow: {
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 30,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   greetingIcon: {
     marginLeft: 10,
@@ -222,6 +223,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     marginTop: 8,
+    fontFamily: typography.fontFamily.medium,
   },
   heroCard: {
     borderRadius: 32,
@@ -237,12 +239,13 @@ const styles = StyleSheet.create({
   heroTitle: {
     width: '100%',
     fontSize: 22,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     textAlign: 'center',
   },
   heroSubtitle: {
     width: '100%',
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 21,
     marginTop: 8,
     marginBottom: 14,
@@ -268,10 +271,11 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.extraBold,
   },
   infoSubtitle: {
     fontSize: 13,
+    fontFamily: typography.fontFamily.medium,
     marginTop: 4,
     lineHeight: 18,
   },
@@ -281,8 +285,6 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   metricCard: {
-    flex: 1,
-    aspectRatio: 1,
     borderRadius: 24,
     padding: 14,
     alignItems: 'center',
@@ -297,7 +299,7 @@ const styles = StyleSheet.create({
   },
   metricValue: {
     fontSize: 24,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   metricValueBox: {
     height: 38,
@@ -306,11 +308,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   metricLabel: {
+    width: '100%',
     height: 36,
     fontSize: 13,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 17,
     marginTop: 2,
     textAlign: 'center',
     textAlignVertical: 'center',
-  }
+  },
 });

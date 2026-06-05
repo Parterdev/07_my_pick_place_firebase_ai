@@ -27,6 +27,7 @@ import {
   requestLocationPermission,
 } from '../../utils/permissions';
 import FontAwesome from '@react-native-vector-icons/fontawesome-free-solid';
+import { typography } from '../../theme/typography';
 
 const confettiAnimation = require('../../assets/lotties/ConfettiAnimation.json');
 const DoneIcon = svgAssets.doneIcon;
@@ -201,7 +202,7 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
             iconElement={
               <FontAwesome name="tag" size={18} color={colors.brand} />
             }
-            label="*Nombre del lugar"
+            label="Nombre del lugar *"
             placeholder="Ej. Parque La Carolina"
             value={title}
             onChangeText={setTitle}
@@ -212,7 +213,7 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
             iconElement={
               <FontAwesome name="pen-to-square" size={18} color={colors.brand} />
             }
-            label="*Descripción"
+            label="Descripción *"
             placeholder="Describe brevemente tu experiencia"
             value={description}
             onChangeText={setDescription}
@@ -281,7 +282,7 @@ export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
               },
             ]}>
             <Text style={[styles.locationTitle, { color: colors.text }]}>
-              *Ubicación GPS
+              Ubicación GPS *
             </Text>
 
             {location ? (
@@ -365,12 +366,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 14,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     textAlign: 'center',
     lineHeight: 22,
     marginTop: 8,
@@ -405,6 +407,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 8,
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
   },
   locationBox: {
     borderWidth: 1,
@@ -415,11 +418,12 @@ const styles = StyleSheet.create({
   },
   locationTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.extraBold,
     marginBottom: 6,
   },
   locationText: {
     fontSize: 13,
+    fontFamily: typography.fontFamily.medium,
     marginTop: 2,
   },
   modalOverlay: {
@@ -437,12 +441,13 @@ const styles = StyleSheet.create({
   },
   successTitle: {
     fontSize: 26,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 4,
     textAlign: 'center',
   },
   successText: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 22,
     textAlign: 'center',
     marginTop: 10,
@@ -474,7 +479,7 @@ const styles = StyleSheet.create({
   },
   previewTitle: {
     fontSize: 18,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     textAlign: 'center',
   },
   changePhotoBadge: {
@@ -489,7 +494,7 @@ const styles = StyleSheet.create({
   changePhotoText: {
     color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   photoWrapper: {
     position: 'relative',
@@ -507,6 +512,6 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.18,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-  }
+    shadowOffset: {width: 0, height: 3},
+  },
 });

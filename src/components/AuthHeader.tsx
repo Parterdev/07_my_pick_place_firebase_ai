@@ -1,6 +1,7 @@
 import React from 'react';
 import {Image, ImageSourcePropType, StyleSheet, Text, View} from 'react-native';
 import {useThemeMode} from '../hooks/useThemeMode';
+import { typography } from '../theme/typography';
 
 interface AuthHeaderProps {
   title: string;
@@ -69,11 +70,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.black,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
     textAlign: 'center',
     marginTop: 8,
     lineHeight: 20,

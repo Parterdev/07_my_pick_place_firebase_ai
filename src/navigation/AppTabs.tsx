@@ -9,6 +9,7 @@ import {BehaviorSummaryScreen} from '../screens/app/BehaviorSummaryScreen';
 import {useThemeMode} from '../hooks/useThemeMode';
 import {GalleryNavigator} from './GalleryNavigator';
 import {imageAssets, svgAssets} from '../assets/images';
+import { typography } from '../theme/typography';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
@@ -61,7 +62,7 @@ export const AppTabs = () => {
         tabBarInactiveTintColor: colors.tabInactive,
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '800',
+          fontFamily: typography.fontFamily.extraBold,
         },
       }}>
       <Tab.Screen

@@ -5,6 +5,7 @@ import CloseIcon from '../assets/images/close_icon.svg';
 import { useThemeMode } from '../hooks/useThemeMode';
 import { PlaceExperience } from '../types/place';
 import { formatCoordinate, formatPlaceDate } from '../utils/formatters';
+import { typography } from '../theme/typography';
 
 interface PlaceCardProps {
   place: PlaceExperience;
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.16,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
   },
   image: {
     width: '100%',
@@ -141,12 +142,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   description: {
     fontSize: 14,
     lineHeight: 20,
     marginTop: 6,
+    fontFamily: typography.fontFamily.medium,
   },
   locationBox: {
     borderWidth: 1,
@@ -157,10 +159,11 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: typography.fontFamily.semiBold,
   },
   date: {
     fontSize: 12,
+    fontFamily: typography.fontFamily.medium,
   },
   inlineInfoRow: {
     flexDirection: 'row',

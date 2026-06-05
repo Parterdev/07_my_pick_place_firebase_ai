@@ -8,6 +8,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import {useThemeMode} from '../hooks/useThemeMode';
+import { typography } from '../theme/typography';
 
 interface AppButtonProps {
   title: string;
@@ -85,6 +86,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.extraBold,
   },
 });

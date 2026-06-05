@@ -27,6 +27,7 @@ import {
 import { AppTabParamList } from '../../types/navigation';
 import { PlaceExperience, UserBehaviorSummary } from '../../types/place';
 import { getProfileAliasByPlacesCount, toSentenceTitle } from '../../utils';
+import { typography } from '../../theme/typography';
 
 type Props = BottomTabScreenProps<AppTabParamList, 'BehaviorSummary'>;
 
@@ -247,20 +248,20 @@ export const BehaviorSummaryScreen = ({ navigation }: Props) => {
             <RNImage source={avatar} style={styles.avatar} />
           </View>
 
-          <Text style={[styles.title, {color: HERO_TEXT_COLOR}]}>
-  Resumen de tu comportamiento
-</Text>
+          <Text style={[styles.title, { color: HERO_TEXT_COLOR }]}>
+            Resumen de tu comportamiento
+          </Text>
 
-          <Text style={[styles.subtitle, {color: HERO_MUTED_TEXT_COLOR}]}>
-  Gemini analiza tus lugares guardados para descubrir qué tipo de experiencias
-  sueles capturar.
-</Text>
+          <Text style={[styles.subtitle, { color: HERO_MUTED_TEXT_COLOR }]}>
+            MyPickPlace analiza tus lugares guardados para descubrir qué tipo de experiencias
+            sueles capturar.
+          </Text>
 
-          <View style={[styles.counterPill, {backgroundColor: HERO_PILL_BACKGROUND}]}>
-  <Text style={[styles.counterText, {color: colors.brand}]}>
-    {places.length} lugares registrados
-  </Text>
-</View>
+          <View style={[styles.counterPill, { backgroundColor: HERO_PILL_BACKGROUND }]}>
+            <Text style={[styles.counterText, { color: colors.brand }]}>
+              {places.length} lugares registrados
+            </Text>
+          </View>
         </LinearGradient>
 
         {loading ? (
@@ -437,7 +438,7 @@ export const BehaviorSummaryScreen = ({ navigation }: Props) => {
             </Text>
 
             <Text style={[styles.infoText, { color: colors.muted }]}>
-              Gemini revisará nombres, descripciones, coordenadas, referencias
+              Revisaremos nombres, descripciones, coordenadas, referencias
               Google, ratings y horarios para crear tu perfil fotográfico.
             </Text>
 
@@ -496,29 +497,30 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 23,
     textAlign: 'center',
     marginTop: 10,
   },
   counterPill: {
     borderRadius: 18,
-  paddingHorizontal: 16,
-  paddingVertical: 9,
-  marginTop: 16,
-  shadowColor: '#000',
-  shadowOpacity: 0.06,
-  shadowRadius: 8,
-  shadowOffset: {width: 0, height: 3},
-  elevation: 2,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
   counterText: {
     fontSize: 13,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   centerBox: {
     alignItems: 'center',
@@ -527,7 +529,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: typography.fontFamily.bold,
   },
   infoCard: {
     borderWidth: 1,
@@ -537,10 +539,11 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   infoText: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 23,
     marginTop: 10,
     marginBottom: 18,
@@ -556,30 +559,32 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   profileTitle: {
     fontSize: 24,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   personalityType: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: typography.fontFamily.bold,
     marginTop: 10,
     lineHeight: 22,
   },
   personalityHighlight: {
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   summaryText: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 23,
     marginTop: 12,
   },
   listItem: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 23,
     marginTop: 6,
   },
@@ -602,7 +607,7 @@ const styles = StyleSheet.create({
   },
   lockedButtonText: {
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.extraBold,
     textAlign: 'center',
   },
 });

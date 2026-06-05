@@ -16,6 +16,7 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useThemeMode } from '../../hooks/useThemeMode';
 import { listUserPlaceExperiences } from '../../services/places.service';
 import { getProfileAliasByPlacesCount } from '../../utils/profileAlias';
+import { typography } from '../../theme/typography';
 
 export const ProfileScreen = () => {
   const { user, logout } = useAuthContext();
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 23,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 4,
     textAlign: 'center',
   },
@@ -172,15 +173,16 @@ const styles = StyleSheet.create({
   },
   aliasText: {
     fontSize: 15,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
   },
   aliasCount: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: typography.fontFamily.bold,
     marginTop: 2,
   },
   email: {
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
     marginTop: 12,
     textAlign: 'center',
   },
@@ -201,10 +203,11 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: typography.fontFamily.extraBold,
   },
   optionSubtitle: {
     fontSize: 13,
+    fontFamily: typography.fontFamily.medium,
     marginTop: 3,
   },
   logoutButton: {

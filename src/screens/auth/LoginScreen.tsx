@@ -21,6 +21,7 @@ import { useThemeMode } from '../../hooks/useThemeMode';
 import { AuthStackParamList } from '../../types/navigation';
 import { formatFirebaseAuthError } from '../../utils/formatters';
 import { validateLoginForm } from '../../utils/validators';
+import { typography } from '../../theme/typography';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -120,7 +121,7 @@ export const LoginScreen = ({ navigation }: Props) => {
               style={styles.footer}>
               <Text style={[styles.footerText, { color: colors.muted }]}>
                 ¿Aún no tienes cuenta?{' '}
-                <Text style={{ color: colors.brand, fontWeight: '900' }}>
+                <Text style={{ color: colors.brand, fontFamily: typography.fontFamily.black }}>
                   Crear cuenta
                 </Text>
               </Text>
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {width: 0, height: 10},
     elevation: 5,
   },
   imageHeader: {
@@ -166,11 +167,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 22,
     textAlign: 'center',
     marginTop: 8,
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
   },
   forgotText: {
     fontSize: 13,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.extraBold,
   },
   footer: {
     marginTop: 24,
@@ -191,6 +193,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
     textAlign: 'center',
   },
 });

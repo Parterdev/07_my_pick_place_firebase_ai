@@ -24,6 +24,7 @@ import {
 } from '../../services/places.service';
 import { PlaceExperience } from '../../types/place';
 import {imageAssets} from '../../assets/images';
+import { typography } from '../../theme/typography';
 
 type Props = NativeStackScreenProps<GalleryStackParamList, 'GalleryList'>;
 
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: typography.fontFamily.semiBold,
   },
   content: {
     padding: 22,
@@ -250,16 +251,17 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   kicker: {
-    fontSize: 14,
-    fontWeight: '900',
+    fontSize: 20,
+    fontFamily: typography.fontFamily.black,
   },
   title: {
     fontSize: 30,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 8,
   },
   subtitle: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 22,
     marginTop: 8,
   },
@@ -275,11 +277,12 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 24,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     textAlign: 'center',
     lineHeight: 22,
     marginTop: 10,
@@ -305,19 +308,20 @@ const styles = StyleSheet.create({
   },
   deleteTitle: {
     fontSize: 24,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 12,
     textAlign: 'center',
   },
   deleteText: {
     fontSize: 15,
+    fontFamily: typography.fontFamily.medium,
     lineHeight: 22,
     textAlign: 'center',
     marginTop: 10,
   },
   deletePlaceName: {
     fontSize: 16,
-    fontWeight: '900',
+    fontFamily: typography.fontFamily.black,
     marginTop: 14,
     textAlign: 'center',
   },
