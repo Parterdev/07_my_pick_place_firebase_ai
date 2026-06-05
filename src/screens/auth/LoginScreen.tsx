@@ -19,8 +19,7 @@ import {useAuthForm} from '../../hooks/useAuthForm';
 import {useThemeMode} from '../../hooks/useThemeMode';
 import {validateLoginForm, isValidEmail} from '../../utils/validators';
 import {formatFirebaseAuthError} from '../../utils/formatters';
-
-const loginImage = require('../../assets/images/login.png');
+import {imageAssets} from '../../assets/images';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -64,7 +63,7 @@ export const LoginScreen = ({navigation}: Props) => {
             emoji="🧳"
             title="Login to MyPickPlace"
             subtitle="Accede para guardar tus lugares favoritos y descubrir nuevas experiencias."
-            imageSource={loginImage}
+            imageSource={imageAssets.login}
           />
 
           <AppInput

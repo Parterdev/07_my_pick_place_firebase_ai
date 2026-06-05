@@ -18,10 +18,9 @@ import {useAuthContext} from '../../context/AuthContext';
 import {useThemeMode} from '../../hooks/useThemeMode';
 import {formatFirebaseAuthError} from '../../utils/formatters';
 import {isValidEmail} from '../../utils/validators';
+import {imageAssets} from '../../assets/images';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
-
-const registerImage = require('../../assets/images/register.png');
 
 export const ForgotPasswordScreen = ({navigation}: Props) => {
   const {colors} = useThemeMode();
@@ -67,7 +66,7 @@ export const ForgotPasswordScreen = ({navigation}: Props) => {
         keyboardShouldPersistTaps="handled">
         <View style={[styles.card, {backgroundColor: colors.card}]}>
           <AuthHeader
-            imageSource={registerImage}
+            imageSource={imageAssets.register}
             title="Recupera tu acceso"
             subtitle="Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña."
           />

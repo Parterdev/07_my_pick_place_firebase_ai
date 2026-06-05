@@ -19,8 +19,7 @@ import {useAuthForm} from '../../hooks/useAuthForm';
 import {useThemeMode} from '../../hooks/useThemeMode';
 import {validateRegisterForm} from '../../utils/validators';
 import {formatFirebaseAuthError} from '../../utils/formatters';
-
-const registerImage = require('../../assets/images/register.png');
+import {imageAssets} from '../../assets/images';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -72,7 +71,7 @@ export const RegisterScreen = ({navigation}: Props) => {
         keyboardShouldPersistTaps="handled">
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <AuthHeader
-            imageSource={registerImage}
+            imageSource={imageAssets.register}
             title="Sign Up to Explore"
             subtitle="Crea tu cuenta y empieza a construir tu galería inteligente de lugares."
           />

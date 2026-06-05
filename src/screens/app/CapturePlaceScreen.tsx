@@ -24,9 +24,10 @@ import {
   requestCameraPermission,
   requestLocationPermission,
 } from '../../utils/permissions';
+import {svgAssets} from '../../assets/images';
 
 const confettiAnimation = require('../../assets/lotties/ConfettiAnimation.json');
-import DoneIcon from '../../assets/images/done_icon.svg';
+const DoneIcon = svgAssets.doneIcon;
 
 export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
   const { colors } = useThemeMode();

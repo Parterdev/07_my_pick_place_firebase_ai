@@ -23,9 +23,9 @@ import {
   listUserPlaceExperiences
 } from '../../services/places.service';
 import { PlaceExperience } from '../../types/place';
+import {imageAssets} from '../../assets/images';
 
 type Props = NativeStackScreenProps<GalleryStackParamList, 'GalleryList'>;
-const cryingIcon = require('../../assets/images/crying_icon.png');
 
 export const GalleryScreen = ({ navigation }: Props) => {
   const { colors } = useThemeMode();
@@ -185,7 +185,7 @@ export const GalleryScreen = ({ navigation }: Props) => {
         onRequestClose={closeDeleteModal}>
         <View style={styles.modalOverlay}>
           <View style={[styles.deleteCard, { backgroundColor: colors.card }]}>
-            <Image source={cryingIcon} style={styles.deleteImage} />
+            <Image source={imageAssets.cryingIcon} style={styles.deleteImage} />
 
             <Text style={[styles.deleteTitle, { color: colors.title }]}>
               ¿Eliminar experiencia?
