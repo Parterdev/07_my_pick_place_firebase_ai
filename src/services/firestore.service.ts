@@ -6,10 +6,11 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from 'firebase/firestore';
-import {db} from '../config/firebase';
-import {PlaceExperience} from '../types/place';
+import { db } from '../config/firebase';
+import {PlaceAIInsights, PlaceExperience} from '../types/place';
 
 export const savePlaceExperience = async (
   place: Omit<PlaceExperience, 'id' | 'createdAt'>,
@@ -55,6 +56,7 @@ export const getUserPlaceExperiences = async (
         latitude: data.latitude,
         longitude: data.longitude,
         createdAt: data.createdAt ?? null,
+        aiInsights: data.aiInsights ?? null,
       } as PlaceExperience;
     });
 
@@ -77,6 +79,27 @@ export const deletePlaceDocument = async (placeId: string): Promise<void> => {
     console.log('[Firestore] Documento eliminado correctamente:', placeId);
   } catch (error) {
     console.error('[Firestore] Error eliminando documento:', error);
+    throw error;
+  }
+};
+
+export const updatePlaceAIInsights = async (
+  placeId: string,
+  aiInsights: PlaceAIInsights,
+): Promise<void> => {
+  try {
+    console.log('[Firestore] Guardando IA para experiencia:', placeId);
+
+    await updateDoc(doc(db, 'places', placeId), {
+      aiInsights: {
+        ...aiInsights,
+        generatedAt: serverTimestamp(),
+      },
+    });
+
+    console.log('[Firestore] IA guardada correctamente.');
+  } catch (error) {
+    console.error('[Firestore] Error guardando IA:', error);
     throw error;
   }
 };

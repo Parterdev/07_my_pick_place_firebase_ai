@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   Image,
   Linking,
   Pressable,
@@ -8,6 +9,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import { generateMockPlaceInsights } from '../../services/ai.service';
+import { PlaceAIInsights } from '../../types/place';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppButton } from '../../components/AppButton';
@@ -15,6 +18,7 @@ import { imageAssets } from '../../assets/images';
 import { useThemeMode } from '../../hooks/useThemeMode';
 import { GalleryStackParamList } from '../../types/navigation';
 import { formatCoordinate, formatPlaceDate } from '../../utils/formatters';
+import { savePlaceAIInsights } from '../../services/places.service';
 
 type Props = NativeStackScreenProps<GalleryStackParamList, 'PlaceDetail'>;
 
@@ -22,9 +26,32 @@ export const PlaceDetailScreen = ({ route, navigation }: Props) => {
   const { colors } = useThemeMode();
   const { place } = route.params;
 
+  const [aiInsights, setAiInsights] = useState<PlaceAIInsights | null>(
+    place.aiInsights ?? null,
+  );
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+
   const openInGoogleMaps = async () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
     await Linking.openURL(url);
+  };
+
+  const handleGenerateAIInsights = async () => {
+    try {
+      setLoadingAI(true);
+
+      const result = await generateMockPlaceInsights(place);
+
+      setAiInsights(result);
+      setShowRecommendations(true);
+
+      await savePlaceAIInsights(place.id, result);
+    } catch (error) {
+      console.error('[PlaceDetailScreen] Error generando IA:', error);
+    } finally {
+      setLoadingAI(false);
+    }
   };
 
   return (
@@ -127,11 +154,125 @@ export const PlaceDetailScreen = ({ route, navigation }: Props) => {
                 Recomendaciones con IA
               </Text>
 
-              <Text style={[styles.aiText, { color: colors.muted }]}>
-                En la siguiente etapa, esta sección mostrará sugerencias de
-                lugares similares, descripciones inteligentes y recomendaciones
-                basadas en la experiencia guardada.
-              </Text>
+              {!aiInsights ? (
+                <>
+                  <Text style={[styles.aiText, { color: colors.muted }]}>
+                    Genera una lectura inteligente usando el nombre, descripción y
+                    ubicación de esta experiencia.
+                  </Text>
+
+                  <AppButton
+                    title="Generar recomendaciones"
+                    onPress={handleGenerateAIInsights}
+                    loading={loadingAI}
+                    variant="secondary"
+                  />
+                </>
+              ) : (
+                <View style={styles.aiResultContainer}>
+                  <View style={[styles.aiSummaryCard, { backgroundColor: colors.card }]}>
+                    <Text style={[styles.aiSectionLabel, { color: colors.brand }]}>
+                      Resumen inteligente
+                    </Text>
+
+                    <Text style={[styles.aiSummaryText, { color: colors.muted }]}>
+                      {aiInsights.summary}
+                    </Text>
+                  </View>
+
+                  <View style={styles.aiMetaRow}>
+                    <View style={[styles.aiMetaCard, { backgroundColor: colors.card }]}>
+                      <Text style={[styles.aiSectionLabel, { color: colors.brand }]}>
+                        Categoría
+                      </Text>
+
+                      <Text style={[styles.aiMetaText, { color: colors.title }]}>
+                        {aiInsights.category}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {showRecommendations ? (
+                    <>
+                      <View style={styles.tagsContainer}>
+                        {aiInsights.tags.map(tag => (
+                          <View
+                            key={tag}
+                            style={[
+                              styles.tagPill,
+                              {
+                                backgroundColor: colors.card,
+                                borderColor: colors.border,
+                              },
+                            ]}>
+                            <Text style={[styles.tagText, { color: colors.brand }]}>
+                              #{tag}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+
+                      <Text style={[styles.recommendationTitle, { color: colors.title }]}>
+                        Sitios sugeridos
+                      </Text>
+
+                      {aiInsights.recommendations.map((recommendation, index) => (
+                        <View
+                          key={`${recommendation.name}-${index}`}
+                          style={[
+                            styles.recommendationCard,
+                            {
+                              backgroundColor: colors.card,
+                              borderColor: colors.border,
+                            },
+                          ]}>
+                          <View style={styles.recommendationHeader}>
+                            <Image source={imageAssets.starIcon} style={styles.starIcon} />
+
+                            <View style={styles.recommendationContent}>
+                              <Text
+                                style={[styles.recommendationName, { color: colors.title }]}>
+                                {recommendation.name}
+                              </Text>
+
+                              <Text
+                                style={[styles.recommendationCategory, { color: colors.brand }]}>
+                                {recommendation.category}
+                              </Text>
+                            </View>
+
+                            {recommendation.rating ? (
+                              <Text style={[styles.ratingText, { color: colors.muted }]}>
+                                ★ {recommendation.rating.toFixed(1)}
+                              </Text>
+                            ) : null}
+                          </View>
+
+                          <Text
+                            style={[styles.recommendationDescription, { color: colors.muted }]}>
+                            {recommendation.description}
+                          </Text>
+                        </View>
+                      ))}
+                    </>
+                  ) : (
+                    <Text style={[styles.aiText, { color: colors.muted }]}>
+                      Las recomendaciones ya fueron generadas para esta experiencia. Puedes
+                      desplegarlas cuando quieras revisarlas nuevamente.
+                    </Text>
+                  )}
+
+                  <AppButton
+                    title={
+                      showRecommendations
+                        ? 'Ocultar recomendaciones'
+                        : 'Mostrar recomendaciones'
+                    }
+                    onPress={() => setShowRecommendations(current => !current)}
+                    variant="secondary"
+                  />
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -238,5 +379,93 @@ const styles = StyleSheet.create({
     width: 86,
     height: 86,
     resizeMode: 'contain',
+  },
+  aiResultContainer: {
+    width: '100%',
+    marginTop: 18,
+  },
+  aiSummaryCard: {
+    borderRadius: 22,
+    padding: 16,
+  },
+  aiSectionLabel: {
+    fontSize: 12,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  aiSummaryText: {
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  aiMetaRow: {
+    marginTop: 14,
+  },
+  aiMetaCard: {
+    borderRadius: 20,
+    padding: 16,
+  },
+  aiMetaText: {
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 14,
+  },
+  tagPill: {
+    borderWidth: 1,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  recommendationTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    marginTop: 22,
+    marginBottom: 12,
+  },
+  recommendationCard: {
+    borderWidth: 1,
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 12,
+  },
+  recommendationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  starIcon: {
+    width: 34,
+    height: 34,
+    resizeMode: 'contain',
+    marginRight: 10,
+  },
+  recommendationContent: {
+    flex: 1,
+  },
+  recommendationName: {
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  recommendationCategory: {
+    fontSize: 12,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  ratingText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  recommendationDescription: {
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 10,
   },
 });

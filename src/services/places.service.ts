@@ -1,9 +1,14 @@
 import {Timestamp} from 'firebase/firestore';
-import {CreatePlaceInput, PlaceExperience} from '../types/place';
+import {
+  CreatePlaceInput, 
+  PlaceExperience,
+  PlaceAIInsights,
+} from '../types/place';
 import {
   deletePlaceDocument,
   getUserPlaceExperiences,
   savePlaceExperience,
+  updatePlaceAIInsights,
 } from './firestore.service';
 import {deletePlaceImage, uploadPlaceImage} from './storage.service';
 
@@ -96,4 +101,21 @@ export const deletePlaceExperience = async (
   );
 
   console.log('[Places] Experiencia eliminada:', place.id);
+};
+
+export const savePlaceAIInsights = async (
+  placeId: string,
+  aiInsights: PlaceAIInsights,
+): Promise<void> => {
+  if (!placeId) {
+    throw new Error('No se encontró el identificador del lugar.');
+  }
+
+  await withTimeout(
+    updatePlaceAIInsights(placeId, aiInsights),
+    20000,
+    'El guardado de recomendaciones IA tardó demasiado.',
+  );
+
+  console.log('[Places] Recomendaciones IA guardadas:', placeId);
 };

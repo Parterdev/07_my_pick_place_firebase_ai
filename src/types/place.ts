@@ -6,6 +6,30 @@ export interface PlaceLocation {
   longitude: number;
 }
 
+export type RecommendationSource = 'google_places' | 'chatgpt' | 'mock';
+
+export interface RecommendedPlace {
+  id?: string;
+  name: string;
+  category: string;
+  description: string;
+  rating?: number;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  imageUrl?: string;
+  source: RecommendationSource;
+}
+
+export interface PlaceAIInsights {
+  summary: string;
+  category: string;
+  tags: string[];
+  recommendations: RecommendedPlace[];
+  generatedAt?: Timestamp | null;
+  provider?: 'chatgpt' | 'mock';
+}
+
 export interface PlaceExperience {
   id: string;
   userId: string;
@@ -15,6 +39,8 @@ export interface PlaceExperience {
   latitude: number;
   longitude: number;
   createdAt?: Timestamp | null;
+
+  aiInsights?: PlaceAIInsights | null;
 }
 
 export interface CreatePlaceInput {
