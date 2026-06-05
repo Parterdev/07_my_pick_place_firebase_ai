@@ -1,21 +1,25 @@
-import React, {useCallback, useState} from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {AppButton} from '../../components/AppButton';
-import {useAuthContext} from '../../context/AuthContext';
-import {useThemeMode} from '../../hooks/useThemeMode';
-import {listUserPlaceExperiences} from '../../services/places.service';
+import { useFocusEffect } from '@react-navigation/native';
+import FontAwesome from '@react-native-vector-icons/fontawesome-free-solid';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppButton } from '../../components/AppButton';
+import { useAuthContext } from '../../context/AuthContext';
+import { useThemeMode } from '../../hooks/useThemeMode';
+import { listUserPlaceExperiences } from '../../services/places.service';
 
-export const HomeScreen = ({navigation}: any) => {
-  const {user} = useAuthContext();
-  const {colors} = useThemeMode();
+const imageIcon = require('../../assets/images/image_icon.png');
+
+export const HomeScreen = ({ navigation }: any) => {
+  const { user } = useAuthContext();
+  const { colors } = useThemeMode();
 
   const [placesCount, setPlacesCount] = useState(0);
   const [loadingCount, setLoadingCount] = useState(false);
@@ -47,76 +51,102 @@ export const HomeScreen = ({navigation}: any) => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, {backgroundColor: colors.background}]}>
+      style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.kicker, {color: colors.brand}]}>
+        <Text style={[styles.kicker, { color: colors.brand }]}>
           MyPickPlace
         </Text>
 
-        <Text style={[styles.title, {color: colors.title}]}>
-          Hola, {user?.displayName || 'explorador'} 👋
-        </Text>
+        <View style={styles.greetingRow}>
+          <Text style={[styles.title, { color: colors.title }]}>
+            Hola, {user?.displayName || 'explorador'}
+          </Text>
 
-        <Text style={[styles.subtitle, {color: colors.muted}]}>
+          <FontAwesome
+            name="hands-clapping"
+            size={34}
+            color={colors.brand}
+            style={styles.greetingIcon}
+          />
+        </View>
+
+        <Text style={[styles.subtitle, { color: colors.muted }]}>
           Guarda lugares nuevos, revive tus experiencias y descubre sitios
           similares cerca de ti.
         </Text>
 
-        <View style={[styles.heroCard, {backgroundColor: colors.card}]}>
-          <Text style={styles.heroEmoji}>📸📍</Text>
+        <View style={[styles.heroCard, { backgroundColor: colors.card }]}>
+          <Image source={imageIcon} style={styles.heroImage} />
 
-          <Text style={[styles.heroTitle, {color: colors.title}]}>
-            Captura tu próximo lugar
+          <Text style={[styles.heroTitle, { color: colors.title }]}>
+            ¿Capturamos algo ahora?
           </Text>
 
-          <Text style={[styles.heroSubtitle, {color: colors.muted}]}>
-            Guarda una fotografía, ubicación GPS y descripción de tus nuevas
-            experiencias.
+          <Text style={[styles.heroSubtitle, { color: colors.muted }]}>
+            Registra ese sitio que llamó tu atención y conviértelo en un momento para recordar.
           </Text>
 
           <AppButton
-            title="Capturar lugar"
+            title="Iniciar experiencia"
             onPress={() => navigation.navigate('CapturePlace')}
           />
         </View>
 
-        <View style={[styles.infoCard, {backgroundColor: colors.card}]}>
-          <Text style={styles.infoEmoji}>📍</Text>
+        <View style={[styles.infoCard, { backgroundColor: colors.card }]}>
+          <View style={[styles.infoIconBox, { backgroundColor: colors.input }]}>
+            <FontAwesome
+              name="location-dot"
+              size={26}
+              color={colors.brand}
+            />
+          </View>
 
           <View style={styles.infoContent}>
-            <Text style={[styles.infoTitle, {color: colors.title}]}>
-              Tu primera experiencia
+            <Text style={[styles.infoTitle, { color: colors.title }]}>
+              Tu bitácora de lugares
             </Text>
 
-            <Text style={[styles.infoSubtitle, {color: colors.muted}]}>
-              Captura un lugar y aparecerá automáticamente en tu galería.
+            <Text style={[styles.infoSubtitle, { color: colors.muted }]}>
+              Cada sitio registrado se organizará automáticamente en tu galería.
             </Text>
           </View>
         </View>
 
         <View style={styles.metricsRow}>
-          <View style={[styles.metricCard, {backgroundColor: colors.card}]}>
-            <Text style={styles.metricEmoji}>🖼️</Text>
+          <View style={[styles.metricCard, { backgroundColor: colors.card }]}>
+            <View style={[styles.metricIconBox, { backgroundColor: colors.input }]}>
+              <FontAwesome
+                name="map-location-dot"
+                size={25}
+                color={colors.brand}
+              />
+            </View>
 
             {loadingCount ? (
               <ActivityIndicator color={colors.brand} style={styles.loader} />
             ) : (
-              <Text style={[styles.metricValue, {color: colors.title}]}>
+              <Text style={[styles.metricValue, { color: colors.title }]}>
                 {placesCount}
               </Text>
             )}
 
-            <Text style={[styles.metricLabel, {color: colors.muted}]}>
+            <Text style={[styles.metricLabel, { color: colors.muted }]}>
               Lugares
             </Text>
           </View>
 
-          <View style={[styles.metricCard, {backgroundColor: colors.card}]}>
-            <Text style={styles.metricEmoji}>✨</Text>
+          <View style={[styles.metricCard, { backgroundColor: colors.card }]}>
+            <View style={[styles.metricIconBox, { backgroundColor: colors.input }]}>
+              <FontAwesome
+                name="wand-magic-sparkles"
+                size={25}
+                color={colors.brand}
+              />
+            </View>
 
-            <Text style={[styles.metricValue, {color: colors.title}]}>IA</Text>
+            <Text style={[styles.metricValue, { color: colors.title }]}>IA</Text>
 
-            <Text style={[styles.metricLabel, {color: colors.muted}]}>
+            <Text style={[styles.metricLabel, { color: colors.muted }]}>
               Próximo
             </Text>
           </View>
@@ -139,10 +169,18 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     marginTop: 10,
   },
+  greetingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
   title: {
+    flex: 1,
     fontSize: 30,
     fontWeight: '900',
-    marginTop: 8,
+  },
+  greetingIcon: {
+    marginLeft: 10,
   },
   subtitle: {
     fontSize: 15,
@@ -153,20 +191,26 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     padding: 24,
     marginTop: 26,
+    alignItems: 'center',
   },
-  heroEmoji: {
-    fontSize: 54,
-    marginBottom: 16,
+  heroImage: {
+    width: 150,
+    height: 150,
+    resizeMode: 'contain',
   },
   heroTitle: {
+    width: '100%',
     fontSize: 22,
     fontWeight: '900',
+    textAlign: 'center',
   },
   heroSubtitle: {
+    width: '100%',
     fontSize: 14,
     lineHeight: 21,
     marginTop: 8,
     marginBottom: 14,
+    textAlign: 'center',
   },
   infoCard: {
     borderRadius: 24,
@@ -175,8 +219,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 18,
   },
-  infoEmoji: {
-    fontSize: 34,
+  infoIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 14,
   },
   infoContent: {
@@ -201,23 +249,27 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 18,
     alignItems: 'center',
-    minHeight: 132,
+    minHeight: 142,
     justifyContent: 'center',
   },
-  metricEmoji: {
-    fontSize: 28,
+  metricIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   metricValue: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
-    marginTop: 8,
+    marginTop: 10,
   },
   metricLabel: {
     fontSize: 13,
     marginTop: 2,
   },
   loader: {
-    marginTop: 10,
+    marginTop: 12,
     marginBottom: 4,
   },
 });
