@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import FontAwesome from '@react-native-vector-icons/fontawesome-free-solid';
@@ -20,6 +21,11 @@ import { imageAssets } from '../../assets/images';
 export const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuthContext();
   const { colors } = useThemeMode();
+  const { width } = useWindowDimensions();
+
+  const horizontalPadding = 44;
+  const cardsGap = 14;
+  const metricCardSize = (width - horizontalPadding - cardsGap) / 2;
 
   const [placesCount, setPlacesCount] = useState(0);
   const [loadingCount, setLoadingCount] = useState(false);
@@ -113,7 +119,15 @@ export const HomeScreen = ({ navigation }: any) => {
         </View>
 
         <View style={styles.metricsRow}>
-          <View style={[styles.metricCard, { backgroundColor: colors.card }]}>
+          <View
+            style={[
+              styles.metricCard,
+              {
+                width: metricCardSize,
+                height: metricCardSize,
+                backgroundColor: colors.card,
+              },
+            ]}>
             <View style={[styles.metricIconBox, { backgroundColor: colors.input }]}>
               <FontAwesome
                 name="map-location-dot"
@@ -122,44 +136,56 @@ export const HomeScreen = ({ navigation }: any) => {
               />
             </View>
 
-            {loadingCount ? (
-              <ActivityIndicator color={colors.brand} style={styles.loader} />
-            ) : (
-              <Text style={[styles.metricValue, { color: colors.title }]}>
-                {placesCount}
-              </Text>
-            )}
+            <View style={styles.metricValueBox}>
+              {loadingCount ? (
+                <ActivityIndicator color={colors.brand} />
+              ) : (
+                <Text style={[styles.metricValue, { color: colors.title }]}>
+                  {placesCount}
+                </Text>
+              )}
+            </View>
 
-            <Text style={[styles.metricLabel, { color: colors.muted }]}>
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={[styles.metricLabel, { color: colors.muted }]}>
               Lugares
             </Text>
           </View>
 
-          <View style={[styles.metricCard, { backgroundColor: colors.card }]}>
-            <Pressable
-              onPress={() => navigation.navigate('BehaviorSummary')}
-              style={({ pressed }) => [
-                styles.metricCard,
-                {
-                  backgroundColor: colors.card,
-                  opacity: pressed ? 0.84 : 1,
-                },
-              ]}>
-              <View style={[styles.metricIconBox, { backgroundColor: colors.input }]}>
-                <FontAwesome
-                  name="wand-magic-sparkles"
-                  size={25}
-                  color={colors.brand}
-                />
-              </View>
+          <Pressable
+            onPress={() => navigation.navigate('BehaviorSummary')}
+            style={({ pressed }) => [
+              styles.metricCard,
+              {
+                width: metricCardSize,
+                height: metricCardSize,
+                backgroundColor: colors.card,
+                opacity: pressed ? 0.84 : 1,
+              },
+            ]}>
+            <View style={[styles.metricIconBox, { backgroundColor: colors.input }]}>
+              <FontAwesome
+                name="wand-magic-sparkles"
+                size={25}
+                color={colors.brand}
+              />
+            </View>
 
-              <Text style={[styles.metricValue, { color: colors.title }]}>IA</Text>
-
-              <Text style={[styles.metricLabel, { color: colors.muted }]}>
-                Perfil de exploración
+            <View style={styles.metricValueBox}>
+              <Text style={[styles.metricValue, { color: colors.title }]}>
+                IA
               </Text>
-            </Pressable>
-          </View>
+            </View>
+
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={[styles.metricLabel, { color: colors.muted }]}>
+              Perfil de exploración
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -256,15 +282,15 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     flex: 1,
+    aspectRatio: 1,
     borderRadius: 24,
-    padding: 18,
+    padding: 14,
     alignItems: 'center',
-    minHeight: 142,
     justifyContent: 'center',
   },
   metricIconBox: {
-    width: 52,
-    height: 52,
+    width: 50,
+    height: 50,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -272,16 +298,19 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 24,
     fontWeight: '900',
-    marginTop: 10,
+  },
+  metricValueBox: {
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
   },
   metricLabel: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 36,
     fontSize: 13,
+    lineHeight: 17,
     marginTop: 2,
-  },
-  loader: {
-    marginTop: 12,
-    marginBottom: 4,
-  },
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  }
 });

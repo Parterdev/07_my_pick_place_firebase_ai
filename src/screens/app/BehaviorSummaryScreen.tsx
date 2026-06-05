@@ -97,7 +97,9 @@ export const BehaviorSummaryScreen = ({ navigation }: Props) => {
   >(DEFAULT_GRADIENT_COLORS);
 
   const isGeminiMode = FEATURES.RECOMMENDATION_MODE === 'gemini';
-  const placesCount = places.length;
+  const HERO_TEXT_COLOR = '#111827';
+  const HERO_MUTED_TEXT_COLOR = '#6B7280';
+  const HERO_PILL_BACKGROUND = 'rgba(255, 255, 255, 0.72)';
 
   const profileAlias = useMemo(
     () => getProfileAliasByPlacesCount(places.length),
@@ -245,20 +247,20 @@ export const BehaviorSummaryScreen = ({ navigation }: Props) => {
             <RNImage source={avatar} style={styles.avatar} />
           </View>
 
-          <Text style={[styles.title, { color: colors.title }]}>
-            Resumen de tu comportamiento
-          </Text>
+          <Text style={[styles.title, {color: HERO_TEXT_COLOR}]}>
+  Resumen de tu comportamiento
+</Text>
 
-          <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Gemini analiza tus lugares guardados para descubrir qué tipo de experiencias
-            sueles capturar.
-          </Text>
+          <Text style={[styles.subtitle, {color: HERO_MUTED_TEXT_COLOR}]}>
+  Gemini analiza tus lugares guardados para descubrir qué tipo de experiencias
+  sueles capturar.
+</Text>
 
-          <View style={[styles.counterPill, { backgroundColor: colors.input }]}>
-            <Text style={[styles.counterText, { color: colors.brand }]}>
-              {places.length} lugares registrados
-            </Text>
-          </View>
+          <View style={[styles.counterPill, {backgroundColor: HERO_PILL_BACKGROUND}]}>
+  <Text style={[styles.counterText, {color: colors.brand}]}>
+    {places.length} lugares registrados
+  </Text>
+</View>
         </LinearGradient>
 
         {loading ? (
@@ -505,9 +507,14 @@ const styles = StyleSheet.create({
   },
   counterPill: {
     borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    marginTop: 16,
+  paddingHorizontal: 16,
+  paddingVertical: 9,
+  marginTop: 16,
+  shadowColor: '#000',
+  shadowOpacity: 0.06,
+  shadowRadius: 8,
+  shadowOffset: {width: 0, height: 3},
+  elevation: 2,
   },
   counterText: {
     fontSize: 13,

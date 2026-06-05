@@ -1,43 +1,81 @@
-import React, {createContext, useContext, useMemo, useState} from 'react';
-import {darkColors, lightColors, AppColors} from '../theme/colors';
+import React, {createContext, ReactNode, useEffect, useMemo, useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {darkColors, lightColors} from '../theme/colors';
 
 type ThemeMode = 'light' | 'dark';
 
 interface ThemeContextValue {
   mode: ThemeMode;
-  colors: AppColors;
+  isDark: boolean;
+  colors: typeof lightColors;
   toggleTheme: () => void;
+  setThemeMode: (mode: ThemeMode) => void;
 }
 
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextValue | undefined>(
+  undefined,
+);
 
-export const ThemeProvider = ({children}: {children: React.ReactNode}) => {
+const THEME_STORAGE_KEY = '@mypickplace/theme-mode';
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export const ThemeProvider = ({children}: ThemeProviderProps) => {
   const [mode, setMode] = useState<ThemeMode>('light');
+  const [themeLoaded, setThemeLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadStoredTheme = async () => {
+      try {
+        const storedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+
+        if (storedTheme === 'light' || storedTheme === 'dark') {
+          setMode(storedTheme);
+        }
+      } catch (error) {
+        console.error('[ThemeContext] Error cargando tema:', error);
+      } finally {
+        setThemeLoaded(true);
+      }
+    };
+
+    loadStoredTheme();
+  }, []);
+
+  const setThemeMode = async (nextMode: ThemeMode) => {
+    try {
+      setMode(nextMode);
+      await AsyncStorage.setItem(THEME_STORAGE_KEY, nextMode);
+    } catch (error) {
+      console.error('[ThemeContext] Error guardando tema:', error);
+    }
+  };
 
   const toggleTheme = () => {
-    setMode(current => (current === 'light' ? 'dark' : 'light'));
+    const nextMode: ThemeMode = mode === 'dark' ? 'light' : 'dark';
+    setThemeMode(nextMode);
   };
 
   const value = useMemo(
     () => ({
       mode,
-      colors: mode === 'light' ? lightColors : darkColors,
+      isDark: mode === 'dark',
+      colors: mode === 'dark' ? darkColors : lightColors,
       toggleTheme,
+      setThemeMode,
     }),
     [mode],
   );
 
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
-};
-
-export const useThemeContext = () => {
-  const context = useContext(ThemeContext);
-
-  if (!context) {
-    throw new Error('useThemeContext debe usarse dentro de ThemeProvider');
+  if (!themeLoaded) {
+    return null;
   }
 
-  return context;
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };
