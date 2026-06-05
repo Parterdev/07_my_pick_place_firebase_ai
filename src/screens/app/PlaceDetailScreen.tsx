@@ -9,7 +9,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import { generateMockPlaceInsights } from '../../services/ai.service';
+//import { generateMockPlaceInsights } from '../../services/ai.service';
+import {generatePlaceRecommendations} from '../../services/recommendations.service';
 import { PlaceAIInsights } from '../../types/place';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -41,7 +42,8 @@ export const PlaceDetailScreen = ({ route, navigation }: Props) => {
     try {
       setLoadingAI(true);
 
-      const result = await generateMockPlaceInsights(place);
+      //const result = await generateMockPlaceInsights(place);
+      const result = await generatePlaceRecommendations(place);
 
       setAiInsights(result);
       setShowRecommendations(true);
