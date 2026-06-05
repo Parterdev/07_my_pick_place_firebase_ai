@@ -1,10 +1,11 @@
 import {Timestamp} from 'firebase/firestore';
 import {CreatePlaceInput, PlaceExperience} from '../types/place';
 import {
+  deletePlaceDocument,
   getUserPlaceExperiences,
   savePlaceExperience,
 } from './firestore.service';
-import {uploadPlaceImage} from './storage.service';
+import {deletePlaceImage, uploadPlaceImage} from './storage.service';
 
 const withTimeout = async <T>(
   promise: Promise<T>,
@@ -73,4 +74,26 @@ export const listUserPlaceExperiences = async (
   userId: string,
 ): Promise<PlaceExperience[]> => {
   return getUserPlaceExperiences(userId);
+};
+
+export const deletePlaceExperience = async (
+  place: PlaceExperience,
+): Promise<void> => {
+  if (!place.id) {
+    throw new Error('No se encontró el identificador del lugar.');
+  }
+
+  await withTimeout(
+    deletePlaceImage(place.imageUrl),
+    20000,
+    'La eliminación de la imagen tardó demasiado.',
+  );
+
+  await withTimeout(
+    deletePlaceDocument(place.id),
+    20000,
+    'La eliminación del registro tardó demasiado.',
+  );
+
+  console.log('[Places] Experiencia eliminada:', place.id);
 };

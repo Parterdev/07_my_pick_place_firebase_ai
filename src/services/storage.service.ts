@@ -1,4 +1,4 @@
-import {ref, uploadBytes, getDownloadURL} from 'firebase/storage';
+import {deleteObject, getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 import {Asset} from 'react-native-image-picker';
 import {storage} from '../config/firebase';
 
@@ -35,6 +35,23 @@ export const uploadPlaceImage = async (
     return downloadURL;
   } catch (error) {
     console.error('[Storage] Error al subir imagen:', error);
+    throw error;
+  }
+};
+
+export const deletePlaceImage = async (imageUrl: string): Promise<void> => {
+  try {
+    if (!imageUrl) {
+      return;
+    }
+
+    const imageRef = ref(storage, imageUrl);
+
+    await deleteObject(imageRef);
+
+    console.log('[Storage] Imagen eliminada correctamente.');
+  } catch (error) {
+    console.error('[Storage] Error eliminando imagen:', error);
     throw error;
   }
 };

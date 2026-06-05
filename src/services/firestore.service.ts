@@ -1,6 +1,8 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   query,
   serverTimestamp,
@@ -37,18 +39,15 @@ export const getUserPlaceExperiences = async (
 
     const placesRef = collection(db, 'places');
 
-    const placesQuery = query(
-      placesRef,
-      where('userId', '==', userId),
-    );
+    const placesQuery = query(placesRef, where('userId', '==', userId));
 
     const snapshot = await getDocs(placesQuery);
 
-    const places = snapshot.docs.map(doc => {
-      const data = doc.data();
+    const places = snapshot.docs.map(document => {
+      const data = document.data();
 
       return {
-        id: doc.id,
+        id: document.id,
         userId: data.userId,
         title: data.title,
         description: data.description,
@@ -59,18 +58,25 @@ export const getUserPlaceExperiences = async (
       } as PlaceExperience;
     });
 
-    const sortedPlaces = places.sort((a, b) => {
+    return places.sort((a, b) => {
       const dateA = a.createdAt?.toMillis?.() ?? 0;
       const dateB = b.createdAt?.toMillis?.() ?? 0;
 
       return dateB - dateA;
     });
-
-    console.log('[Firestore] Experiencias encontradas:', sortedPlaces.length);
-
-    return sortedPlaces;
   } catch (error) {
     console.error('[Firestore] Error consultando experiencias:', error);
+    throw error;
+  }
+};
+
+export const deletePlaceDocument = async (placeId: string): Promise<void> => {
+  try {
+    await deleteDoc(doc(db, 'places', placeId));
+
+    console.log('[Firestore] Documento eliminado correctamente:', placeId);
+  } catch (error) {
+    console.error('[Firestore] Error eliminando documento:', error);
     throw error;
   }
 };

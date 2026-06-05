@@ -1,33 +1,42 @@
-import React, {useCallback, useState} from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {GalleryStackParamList} from '../../types/navigation';
-import {useFocusEffect} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {AppButton} from '../../components/AppButton';
-import {PlaceCard} from '../../components/PlaceCard';
-import {useAuthContext} from '../../context/AuthContext';
-import {useThemeMode} from '../../hooks/useThemeMode';
-import {listUserPlaceExperiences} from '../../services/places.service';
-import {PlaceExperience} from '../../types/place';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { GalleryStackParamList } from '../../types/navigation';
+import { useFocusEffect } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppButton } from '../../components/AppButton';
+import { PlaceCard } from '../../components/PlaceCard';
+import { useAuthContext } from '../../context/AuthContext';
+import { useThemeMode } from '../../hooks/useThemeMode';
+import {
+  deletePlaceExperience,
+  listUserPlaceExperiences
+} from '../../services/places.service';
+import { PlaceExperience } from '../../types/place';
 
 type Props = NativeStackScreenProps<GalleryStackParamList, 'GalleryList'>;
+const cryingIcon = require('../../assets/images/crying_icon.png');
 
-export const GalleryScreen = ({navigation}: Props) => {
-  const {colors} = useThemeMode();
-  const {user} = useAuthContext();
+export const GalleryScreen = ({ navigation }: Props) => {
+  const { colors } = useThemeMode();
+  const { user } = useAuthContext();
 
   const [places, setPlaces] = useState<PlaceExperience[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [placeToDelete, setPlaceToDelete] = useState<PlaceExperience | null>(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const loadPlaces = useCallback(async () => {
     if (!user?.uid) {
@@ -63,13 +72,55 @@ export const GalleryScreen = ({navigation}: Props) => {
     await loadPlaces();
   };
 
+  const openDeleteModal = (place: PlaceExperience) => {
+    setPlaceToDelete(place);
+    setDeleteModalVisible(true);
+  };
+
+  const closeDeleteModal = () => {
+    if (deleting) {
+      return;
+    }
+
+    setDeleteModalVisible(false);
+    setPlaceToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!placeToDelete) {
+      return;
+    }
+
+    try {
+      setDeleting(true);
+
+      await deletePlaceExperience(placeToDelete);
+
+      setPlaces(currentPlaces =>
+        currentPlaces.filter(place => place.id !== placeToDelete.id),
+      );
+
+      setDeleteModalVisible(false);
+      setPlaceToDelete(null);
+    } catch (error) {
+      console.error('[GalleryScreen] Error eliminando experiencia:', error);
+
+      Alert.alert(
+        'Eliminar experiencia',
+        'No se pudo eliminar el lugar. Inténtalo nuevamente.',
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <SafeAreaView
         edges={['top']}
-        style={[styles.centerContainer, {backgroundColor: colors.background}]}>
+        style={[styles.centerContainer, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.brand} />
-        <Text style={[styles.loadingText, {color: colors.muted}]}>
+        <Text style={[styles.loadingText, { color: colors.muted }]}>
           Cargando tus experiencias...
         </Text>
       </SafeAreaView>
@@ -79,7 +130,7 @@ export const GalleryScreen = ({navigation}: Props) => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, {backgroundColor: colors.background}]}>
+      style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
         data={places}
         keyExtractor={item => item.id}
@@ -92,25 +143,25 @@ export const GalleryScreen = ({navigation}: Props) => {
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[styles.kicker, {color: colors.brand}]}>
+            <Text style={[styles.kicker, { color: colors.brand }]}>
               MyPickPlace
             </Text>
-            <Text style={[styles.title, {color: colors.title}]}>
+            <Text style={[styles.title, { color: colors.title }]}>
               Galería de lugares
             </Text>
-            <Text style={[styles.subtitle, {color: colors.muted}]}>
+            <Text style={[styles.subtitle, { color: colors.muted }]}>
               Aquí se muestran las experiencias que has guardado con foto,
               descripción y ubicación GPS.
             </Text>
           </View>
         }
         ListEmptyComponent={
-          <View style={[styles.emptyCard, {backgroundColor: colors.card}]}>
+          <View style={[styles.emptyCard, { backgroundColor: colors.card }]}>
             <Text style={styles.emoji}>🖼️</Text>
-            <Text style={[styles.emptyTitle, {color: colors.title}]}>
+            <Text style={[styles.emptyTitle, { color: colors.title }]}>
               Galería vacía
             </Text>
-            <Text style={[styles.emptySubtitle, {color: colors.muted}]}>
+            <Text style={[styles.emptySubtitle, { color: colors.muted }]}>
               Tus experiencias aparecerán aquí cuando empieces a guardar lugares.
             </Text>
 
@@ -121,10 +172,54 @@ export const GalleryScreen = ({navigation}: Props) => {
           <PlaceCard
             place={item}
             onPress={() => navigation.navigate('PlaceDetail', { place: item })}
+            onDeletePress={() => openDeleteModal(item)}
           />
         )}
         showsVerticalScrollIndicator={false}
       />
+
+      <Modal
+        visible={deleteModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeDeleteModal}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.deleteCard, { backgroundColor: colors.card }]}>
+            <Image source={cryingIcon} style={styles.deleteImage} />
+
+            <Text style={[styles.deleteTitle, { color: colors.title }]}>
+              ¿Eliminar experiencia?
+            </Text>
+
+            <Text style={[styles.deleteText, { color: colors.muted }]}>
+              Esta acción eliminará el lugar de tu galería y también su imagen
+              almacenada en Firebase Storage.
+            </Text>
+
+            <Text style={[styles.deletePlaceName, { color: colors.brand }]}>
+              {placeToDelete?.title}
+            </Text>
+
+            <View style={styles.deleteActions}>
+              <View style={styles.actionButton}>
+                <AppButton
+                  title="Cancelar"
+                  onPress={closeDeleteModal}
+                  variant="secondary"
+                />
+              </View>
+
+              <View style={styles.actionButton}>
+                <AppButton
+                  title="Eliminar"
+                  onPress={handleConfirmDelete}
+                  loading={deleting}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -189,5 +284,50 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginTop: 10,
     marginBottom: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  deleteCard: {
+    width: '100%',
+    borderRadius: 32,
+    padding: 24,
+    alignItems: 'center',
+  },
+  deleteImage: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
+  },
+  deleteTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  deleteText: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  deletePlaceName: {
+    fontSize: 16,
+    fontWeight: '900',
+    marginTop: 14,
+    textAlign: 'center',
+  },
+  deleteActions: {
+    width: '100%',
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 20,
+  },
+  actionButton: {
+    flex: 1,
   },
 });
