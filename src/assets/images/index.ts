@@ -35,6 +35,8 @@ export const imageAssets = {
   cloudIcon: require('./cloud_icon.png') as ImageSourcePropType,
   recoverIcon: require('./recover_email_icon.png') as ImageSourcePropType,
   botIcon: require('./bot_icon.png') as ImageSourcePropType,
+  sunIcon: require('./sun_icon.png') as ImageSourcePropType,
+  moonIcon: require('./moon_icon.png') as ImageSourcePropType,
 };
 
 export const svgAssets = {

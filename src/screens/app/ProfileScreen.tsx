@@ -1,30 +1,40 @@
-import React, {useCallback, useState} from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Image,
   StyleSheet,
-  Switch,
+  Pressable,
   Text,
   View,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useFocusEffect} from '@react-navigation/native';
-import {AppButton} from '../../components/AppButton';
-import {useAuthContext} from '../../context/AuthContext';
-import {useThemeMode} from '../../hooks/useThemeMode';
-import {listUserPlaceExperiences} from '../../services/places.service';
-import {getProfileAliasByPlacesCount} from '../../utils/profileAlias';
+import { imageAssets } from '../../assets/images';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
+import { AppButton } from '../../components/AppButton';
+import { useAuthContext } from '../../context/AuthContext';
+import { useThemeMode } from '../../hooks/useThemeMode';
+import { listUserPlaceExperiences } from '../../services/places.service';
+import { getProfileAliasByPlacesCount } from '../../utils/profileAlias';
 
 export const ProfileScreen = () => {
-  const {user, logout} = useAuthContext();
-  const {colors, mode, toggleTheme} = useThemeMode();
+  const { user, logout } = useAuthContext();
+  const { colors, mode, toggleTheme } = useThemeMode();
 
   const [loading, setLoading] = useState(false);
   const [placesCount, setPlacesCount] = useState(0);
   const [loadingAlias, setLoadingAlias] = useState(false);
 
   const profileAlias = getProfileAliasByPlacesCount(placesCount);
+  const isDarkMode = mode === 'dark';
+
+  const themeIcon = isDarkMode ? imageAssets.moonIcon : imageAssets.sunIcon;
+
+  const themeTitle = isDarkMode ? 'Modo oscuro activo' : 'Modo claro activo';
+
+  const themeSubtitle = isDarkMode
+    ? 'Toca para cambiar a una apariencia clara.'
+    : 'Toca para cambiar a una apariencia oscura.';
 
   const loadProfileStats = useCallback(async () => {
     if (!user?.uid) {
@@ -64,47 +74,58 @@ export const ProfileScreen = () => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, {backgroundColor: colors.background}]}>
-      <View style={[styles.card, {backgroundColor: colors.card}]}>
+      style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Image source={profileAlias.icon} style={styles.avatarImage} />
 
-        <Text style={[styles.title, {color: colors.title}]}>
+        <Text style={[styles.title, { color: colors.title }]}>
           {user?.displayName || 'Usuario MyPickPlace'}
         </Text>
 
-        <View style={[styles.aliasPill, {backgroundColor: colors.input}]}>
+        <View style={[styles.aliasPill, { backgroundColor: colors.input }]}>
           {loadingAlias ? (
             <ActivityIndicator size="small" color={colors.brand} />
           ) : (
             <>
-              <Text style={[styles.aliasText, {color: colors.brand}]}>
+              <Text style={[styles.aliasText, { color: colors.brand }]}>
                 {profileAlias.alias}
               </Text>
 
-              <Text style={[styles.aliasCount, {color: colors.muted}]}>
+              <Text style={[styles.aliasCount, { color: colors.muted }]}>
                 {placesCount} {placesCount === 1 ? 'experiencia' : 'experiencias'}
               </Text>
             </>
           )}
         </View>
 
-        <Text style={[styles.email, {color: colors.muted}]}>
+        <Text style={[styles.email, { color: colors.muted }]}>
           {user?.email}
         </Text>
 
-        <View style={[styles.option, {borderColor: colors.border}]}>
+        <Pressable
+          onPress={toggleTheme}
+          style={({ pressed }) => [
+            styles.option,
+            {
+              borderColor: colors.border,
+              backgroundColor: colors.input,
+              opacity: pressed ? 0.8 : 1,
+            },
+          ]}>
           <View style={styles.optionContent}>
-            <Text style={[styles.optionTitle, {color: colors.title}]}>
-              Tema oscuro
+            <Text style={[styles.optionTitle, { color: colors.title }]}>
+              {themeTitle}
             </Text>
 
-            <Text style={[styles.optionSubtitle, {color: colors.muted}]}>
-              Cambia la apariencia de la app.
+            <Text style={[styles.optionSubtitle, { color: colors.muted }]}>
+              {themeSubtitle}
             </Text>
           </View>
 
-          <Switch value={mode === 'dark'} onValueChange={toggleTheme} />
-        </View>
+          <View style={[styles.themeIconBox, { backgroundColor: colors.card }]}>
+            <Image source={themeIcon} style={styles.themeIcon} />
+          </View>
+        </Pressable>
 
         <AppButton
           title="Cerrar sesión"
@@ -188,5 +209,17 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     marginTop: 4,
+  },
+  themeIconBox: {
+    width: 54,
+    height: 54,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  themeIcon: {
+    width: 34,
+    height: 34,
+    resizeMode: 'contain',
   },
 });
