@@ -1,3 +1,4 @@
+import {NavigatorScreenParams} from '@react-navigation/native';
 import { PlaceExperience } from "./place";
 
 export type AuthStackParamList = {
@@ -16,6 +17,6 @@ export type GalleryStackParamList = {
 export type AppTabParamList = {
   Home: undefined;
   CapturePlace: undefined;
-  Gallery: undefined;
+  Gallery: NavigatorScreenParams<GalleryStackParamList> | undefined;
   Profile: undefined;
 };

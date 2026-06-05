@@ -1,3 +1,4 @@
+import {Timestamp} from 'firebase/firestore';
 import {CreatePlaceInput, PlaceExperience} from '../types/place';
 import {
   getUserPlaceExperiences,
@@ -31,7 +32,7 @@ export const createPlaceExperience = async ({
   description,
   photo,
   location,
-}: CreatePlaceInput): Promise<string> => {
+}: CreatePlaceInput): Promise<PlaceExperience> => {
   console.log('[Places] Iniciando creación de experiencia.');
 
   const imageUrl = await withTimeout(
@@ -40,24 +41,32 @@ export const createPlaceExperience = async ({
     'La subida de imagen tardó demasiado.',
   );
 
+  const cleanPlace = {
+    userId,
+    title: title.trim(),
+    description: description.trim(),
+    imageUrl,
+    latitude: location.latitude,
+    longitude: location.longitude,
+  };
+
   console.log('[Places] Imagen lista. Guardando en Firestore.');
 
   const placeId = await withTimeout(
-    savePlaceExperience({
-      userId,
-      title: title.trim(),
-      description: description.trim(),
-      imageUrl,
-      latitude: location.latitude,
-      longitude: location.longitude,
-    }),
+    savePlaceExperience(cleanPlace),
     30000,
     'El guardado en Firestore tardó demasiado.',
   );
 
-  console.log('[Places] Experiencia creada:', placeId);
+  const createdPlace: PlaceExperience = {
+    id: placeId,
+    ...cleanPlace,
+    createdAt: Timestamp.now(),
+  };
 
-  return placeId;
+  console.log('[Places] Experiencia creada:', createdPlace);
+
+  return createdPlace;
 };
 
 export const listUserPlaceExperiences = async (

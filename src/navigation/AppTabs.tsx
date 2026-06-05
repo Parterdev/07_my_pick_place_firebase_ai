@@ -60,6 +60,15 @@ export const AppTabs = () => {
           title: 'Galería',
           tabBarIcon: () => <TabIcon emoji="🖼️" />,
         }}
+        listeners={({ navigation }) => ({
+          tabPress: e => {
+            e.preventDefault();
+
+            navigation.navigate('Gallery', {
+              screen: 'GalleryList',
+            });
+          },
+        })}
       />
 
       <Tab.Screen

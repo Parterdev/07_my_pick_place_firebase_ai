@@ -1,30 +1,36 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import LottieView from 'lottie-react-native';
 import {
   Alert,
   Image,
+  Keyboard,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import {Asset} from 'react-native-image-picker';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {AppButton} from '../../components/AppButton';
-import {AppInput} from '../../components/AppInput';
-import {useAuthContext} from '../../context/AuthContext';
-import {useThemeMode} from '../../hooks/useThemeMode';
-import {createPlaceExperience} from '../../services/places.service';
-import {PlaceLocation} from '../../types/place';
-import {takePlacePhoto} from '../../utils/camera';
-import {getCurrentPlaceLocation} from '../../utils/location';
+import { Asset } from 'react-native-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppButton } from '../../components/AppButton';
+import { AppInput } from '../../components/AppInput';
+import { useAuthContext } from '../../context/AuthContext';
+import { useThemeMode } from '../../hooks/useThemeMode';
+import { createPlaceExperience } from '../../services/places.service';
+import { PlaceExperience, PlaceLocation } from '../../types/place';
+import { takePlacePhoto } from '../../utils/camera';
+import { getCurrentPlaceLocation } from '../../utils/location';
 import {
   requestCameraPermission,
   requestLocationPermission,
 } from '../../utils/permissions';
 
-export const CapturePlaceScreen = () => {
-  const {colors} = useThemeMode();
-  const {user} = useAuthContext();
+const confettiAnimation = require('../../assets/lotties/ConfettiAnimation.json');
+import DoneIcon from '../../assets/images/done_icon.svg';
+
+export const CapturePlaceScreen = ({ navigation }: { navigation: any }) => {
+  const { colors } = useThemeMode();
+  const { user } = useAuthContext();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -33,6 +39,8 @@ export const CapturePlaceScreen = () => {
   const [loadingPhoto, setLoadingPhoto] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [createdPlace, setCreatedPlace] = useState<PlaceExperience | null>(null);
 
   const handleTakePhoto = async () => {
     try {
@@ -115,7 +123,7 @@ export const CapturePlaceScreen = () => {
     try {
       setSaving(true);
 
-      await createPlaceExperience({
+      const savedPlace = await createPlaceExperience({
         userId: user.uid,
         title,
         description,
@@ -123,10 +131,10 @@ export const CapturePlaceScreen = () => {
         location,
       });
 
-      Alert.alert(
-        'Lugar guardado',
-        'Tu experiencia fue guardada correctamente en Firebase.',
-      );
+      Keyboard.dismiss();
+
+      setCreatedPlace(savedPlace);
+      setSuccessModalVisible(true);
 
       setTitle('');
       setDescription('');
@@ -138,33 +146,49 @@ export const CapturePlaceScreen = () => {
       Alert.alert(
         'Guardar lugar',
         error?.message ||
-          'No se pudo guardar la experiencia. Inténtalo nuevamente.',
+        'No se pudo guardar la experiencia. Inténtalo nuevamente.',
       );
     } finally {
       setSaving(false);
     }
   };
 
+  const handleSuccessOk = () => {
+    if (!createdPlace) {
+      setSuccessModalVisible(false);
+      return;
+    }
+
+    setSuccessModalVisible(false);
+
+    navigation.navigate('Gallery', {
+      screen: 'PlaceDetail',
+      params: {
+        place: createdPlace,
+      },
+    });
+  };
+
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, {backgroundColor: colors.background}]}>
+      style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled">
-        <View style={[styles.headerCard, {backgroundColor: colors.card}]}>
+        <View style={[styles.headerCard, { backgroundColor: colors.card }]}>
           <Text style={styles.emoji}>📸📍</Text>
 
-          <Text style={[styles.title, {color: colors.title}]}>
+          <Text style={[styles.title, { color: colors.title }]}>
             Captura de lugar
           </Text>
 
-          <Text style={[styles.subtitle, {color: colors.muted}]}>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
             Registra una experiencia con fotografía, descripción y ubicación GPS.
           </Text>
         </View>
 
-        <View style={[styles.formCard, {backgroundColor: colors.card}]}>
+        <View style={[styles.formCard, { backgroundColor: colors.card }]}>
           <AppInput
             icon="🏷️"
             label="Nombre del lugar"
@@ -186,7 +210,7 @@ export const CapturePlaceScreen = () => {
 
           <View style={styles.previewContainer}>
             {photo?.uri ? (
-              <Image source={{uri: photo.uri}} style={styles.previewImage} />
+              <Image source={{ uri: photo.uri }} style={styles.previewImage} />
             ) : (
               <View
                 style={[
@@ -197,7 +221,7 @@ export const CapturePlaceScreen = () => {
                   },
                 ]}>
                 <Text style={styles.previewEmoji}>🖼️</Text>
-                <Text style={[styles.previewText, {color: colors.muted}]}>
+                <Text style={[styles.previewText, { color: colors.muted }]}>
                   Aún no has capturado una foto
                 </Text>
               </View>
@@ -219,21 +243,21 @@ export const CapturePlaceScreen = () => {
                 borderColor: colors.border,
               },
             ]}>
-            <Text style={[styles.locationTitle, {color: colors.text}]}>
+            <Text style={[styles.locationTitle, { color: colors.text }]}>
               Ubicación GPS
             </Text>
 
             {location ? (
               <>
-                <Text style={[styles.locationText, {color: colors.muted}]}>
+                <Text style={[styles.locationText, { color: colors.muted }]}>
                   Latitud: {location.latitude.toFixed(6)}
                 </Text>
-                <Text style={[styles.locationText, {color: colors.muted}]}>
+                <Text style={[styles.locationText, { color: colors.muted }]}>
                   Longitud: {location.longitude.toFixed(6)}
                 </Text>
               </>
             ) : (
-              <Text style={[styles.locationText, {color: colors.muted}]}>
+              <Text style={[styles.locationText, { color: colors.muted }]}>
                 Aún no se ha obtenido la ubicación.
               </Text>
             )}
@@ -253,6 +277,37 @@ export const CapturePlaceScreen = () => {
           />
         </View>
       </ScrollView>
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={handleSuccessOk}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.successCard, { backgroundColor: colors.card }]}>
+            <View style={styles.successIconWrapper}>
+              <DoneIcon width={130} height={130} />
+
+              <LottieView
+                source={confettiAnimation}
+                autoPlay
+                loop={false}
+                style={styles.confettiOverlay}
+              />
+            </View>
+
+            <Text style={[styles.successTitle, { color: colors.title }]}>
+              Lugar guardado
+            </Text>
+
+            <Text style={[styles.successText, { color: colors.muted }]}>
+              Tu experiencia fue guardada correctamente. Ahora puedes revisar el
+              detalle del lugar.
+            </Text>
+
+            <AppButton title="OK" onPress={handleSuccessOk} />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -334,5 +389,43 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 13,
     marginTop: 2,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  successCard: {
+    width: '100%',
+    borderRadius: 32,
+    padding: 24,
+    alignItems: 'center',
+  },
+  successTitle: {
+    fontSize: 26,
+    fontWeight: '900',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  successText: {
+  fontSize: 15,
+  lineHeight: 22,
+  textAlign: 'center',
+  marginTop: 10,
+  marginBottom: 16,
+},
+  successIconWrapper: {
+    width: 190,
+    height: 190,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  confettiOverlay: {
+    position: 'absolute',
+    width: 210,
+    height: 210,
   },
 });
