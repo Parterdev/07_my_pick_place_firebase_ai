@@ -11,6 +11,9 @@ import {
   updatePlaceAIInsights,
 } from './firestore.service';
 import {deletePlaceImage, uploadPlaceImage} from './storage.service';
+import {findGooglePlaceMetadataByLocation} from './googlePlaces.service';
+import {updatePlaceGoogleMetadata} from './firestore.service';
+import {GooglePlaceMetadata} from '../types/place';
 
 const withTimeout = async <T>(
   promise: Promise<T>,
@@ -118,4 +121,32 @@ export const savePlaceAIInsights = async (
   );
 
   console.log('[Places] Recomendaciones IA guardadas:', placeId);
+};
+
+export const resolvePlaceGoogleMetadata = async (
+  place: PlaceExperience,
+): Promise<GooglePlaceMetadata | null> => {
+  if (place.googlePlaceRating && place.googlePlaceName) {
+    return {
+      googlePlaceId: place.googlePlaceId,
+      googlePlaceName: place.googlePlaceName,
+      googlePlaceRating: place.googlePlaceRating,
+      googlePlaceCategory: place.googlePlaceCategory,
+      googlePlaceAddress: place.googlePlaceAddress,
+    };
+  }
+
+  const metadata = await findGooglePlaceMetadataByLocation({
+    latitude: place.latitude,
+    longitude: place.longitude,
+    originalPlaceName: place.title,
+  });
+
+  if (!metadata) {
+    return null;
+  }
+
+  await updatePlaceGoogleMetadata(place.id, metadata);
+
+  return metadata;
 };

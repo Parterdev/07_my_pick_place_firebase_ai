@@ -10,7 +10,11 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import {PlaceAIInsights, PlaceExperience} from '../types/place';
+import {
+  GooglePlaceMetadata,
+  PlaceAIInsights,
+  PlaceExperience,
+} from '../types/place';
 
 export const savePlaceExperience = async (
   place: Omit<PlaceExperience, 'id' | 'createdAt'>,
@@ -56,6 +60,14 @@ export const getUserPlaceExperiences = async (
         latitude: data.latitude,
         longitude: data.longitude,
         createdAt: data.createdAt ?? null,
+
+        googlePlaceId: data.googlePlaceId,
+        googlePlaceName: data.googlePlaceName,
+        googlePlaceRating: data.googlePlaceRating,
+        googlePlaceCategory: data.googlePlaceCategory,
+        googlePlaceAddress: data.googlePlaceAddress,
+        googlePlaceValidatedAt: data.googlePlaceValidatedAt ?? null,
+
         aiInsights: data.aiInsights ?? null,
       } as PlaceExperience;
     });
@@ -100,6 +112,28 @@ export const updatePlaceAIInsights = async (
     console.log('[Firestore] IA guardada correctamente.');
   } catch (error) {
     console.error('[Firestore] Error guardando IA:', error);
+    throw error;
+  }
+};
+
+export const updatePlaceGoogleMetadata = async (
+  placeId: string,
+  metadata: GooglePlaceMetadata,
+): Promise<void> => {
+  try {
+    console.log('[Firestore] Guardando metadata Google del lugar:', {
+      placeId,
+      metadata,
+    });
+
+    await updateDoc(doc(db, 'places', placeId), {
+      ...metadata,
+      googlePlaceValidatedAt: serverTimestamp(),
+    });
+
+    console.log('[Firestore] Metadata Google guardada correctamente.');
+  } catch (error) {
+    console.error('[Firestore] Error guardando metadata Google:', error);
     throw error;
   }
 };

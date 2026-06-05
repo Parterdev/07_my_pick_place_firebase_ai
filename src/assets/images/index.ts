@@ -35,6 +35,7 @@ export const imageAssets = {
   sunIcon: require('./sun_icon.png') as ImageSourcePropType,
   moonIcon: require('./moon_icon.png') as ImageSourcePropType,
   registerIcon: require('./register_icon.png') as ImageSourcePropType,
+  starCalificationIcon: require('./star_calification_icon.png') as ImageSourcePropType,
 };
 
 export const svgAssets = {

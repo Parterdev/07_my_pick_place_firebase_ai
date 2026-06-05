@@ -1,5 +1,5 @@
 import {GOOGLE_CONFIG} from '../config/google';
-import {RecommendedPlace} from '../types/place';
+import {GooglePlaceMetadata, RecommendedPlace} from '../types/place';
 
 interface NearbyPlacesParams {
   latitude: number;
@@ -228,4 +228,173 @@ export const searchNearbyPlaces = async ({
   );
 
   return normalizedPlaces;
+};
+
+const calculateDistanceMeters = (
+  pointA: {latitude: number; longitude: number},
+  pointB: {latitude: number; longitude: number},
+): number => {
+  const earthRadius = 6371000;
+
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+
+  const deltaLat = toRadians(pointB.latitude - pointA.latitude);
+  const deltaLon = toRadians(pointB.longitude - pointA.longitude);
+
+  const lat1 = toRadians(pointA.latitude);
+  const lat2 = toRadians(pointB.latitude);
+
+  const a =
+    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+    Math.cos(lat1) *
+      Math.cos(lat2) *
+      Math.sin(deltaLon / 2) *
+      Math.sin(deltaLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return earthRadius * c;
+};
+
+const getNameMatchBonus = (
+  googlePlaceName?: string,
+  originalPlaceName?: string,
+): number => {
+  if (!googlePlaceName || !originalPlaceName) {
+    return 0;
+  }
+
+  const googleName = normalizeText(googlePlaceName);
+  const originalName = normalizeText(originalPlaceName);
+
+  if (!googleName || !originalName) {
+    return 0;
+  }
+
+  if (googleName === originalName) {
+    return 80;
+  }
+
+  if (googleName.includes(originalName) || originalName.includes(googleName)) {
+    return 50;
+  }
+
+  return 0;
+};
+
+export const findGooglePlaceMetadataByLocation = async ({
+  latitude,
+  longitude,
+  originalPlaceName,
+}: {
+  latitude: number;
+  longitude: number;
+  originalPlaceName?: string;
+}): Promise<GooglePlaceMetadata | null> => {
+  if (!GOOGLE_CONFIG.PLACES_API_KEY) {
+    throw new Error('Google Places API Key no configurada.');
+  }
+
+  console.log('[GooglePlaces] Validando rating del lugar guardado:', {
+    latitude,
+    longitude,
+    originalPlaceName,
+  });
+
+  const response = await fetch(GOOGLE_CONFIG.PLACES_BASE_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': GOOGLE_CONFIG.PLACES_API_KEY,
+      'X-Goog-FieldMask':
+        'places.id,places.displayName,places.formattedAddress,places.rating,places.location,places.types',
+    },
+    body: JSON.stringify({
+      includedTypes: [
+        'tourist_attraction',
+        'historical_landmark',
+        'museum',
+        'art_museum',
+        'park',
+        'restaurant',
+        'cafe',
+        'church',
+        'government_office',
+      ],
+      maxResultCount: 5,
+      languageCode: 'es',
+      regionCode: 'EC',
+      locationRestriction: {
+        circle: {
+          center: {
+            latitude,
+            longitude,
+          },
+          radius: 180,
+        },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    console.error('[GooglePlaces] Error validando lugar guardado:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+    });
+
+    throw new Error('No se pudo validar el lugar guardado en Google Places.');
+  }
+
+  const data = await response.json();
+  const places: GooglePlaceResponseItem[] = data?.places ?? [];
+
+  if (places.length === 0) {
+    console.log('[GooglePlaces] No se encontró metadata para el lugar.');
+    return null;
+  }
+
+  const rankedPlaces = places
+    .filter(place => place.location?.latitude && place.location?.longitude)
+    .map(place => {
+      const distance = calculateDistanceMeters(
+        {latitude, longitude},
+        {
+          latitude: place.location?.latitude ?? latitude,
+          longitude: place.location?.longitude ?? longitude,
+        },
+      );
+
+      const nameBonus = getNameMatchBonus(
+        place.displayName?.text,
+        originalPlaceName,
+      );
+
+      return {
+        place,
+        score: distance - nameBonus,
+        distance,
+      };
+    })
+    .sort((a, b) => a.score - b.score);
+
+  const bestMatch = rankedPlaces[0]?.place;
+
+  if (!bestMatch) {
+    return null;
+  }
+
+  const metadata: GooglePlaceMetadata = {
+    googlePlaceId: bestMatch.id,
+    googlePlaceName: bestMatch.displayName?.text,
+    googlePlaceRating: bestMatch.rating,
+    googlePlaceCategory: translateGoogleType(bestMatch.types?.[0]),
+    googlePlaceAddress: bestMatch.formattedAddress,
+  };
+
+  console.log('[GooglePlaces] Metadata detectada:', metadata);
+
+  return metadata;
 };

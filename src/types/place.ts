@@ -40,6 +40,13 @@ export interface PlaceExperience {
   longitude: number;
   createdAt?: Timestamp | null;
 
+  googlePlaceId?: string;
+  googlePlaceName?: string;
+  googlePlaceRating?: number;
+  googlePlaceCategory?: string;
+  googlePlaceAddress?: string;
+  googlePlaceValidatedAt?: Timestamp | null;
+
   aiInsights?: PlaceAIInsights | null;
 }
 
@@ -49,4 +56,12 @@ export interface CreatePlaceInput {
   description: string;
   photo: Asset;
   location: PlaceLocation;
+}
+
+export interface GooglePlaceMetadata {
+  googlePlaceId?: string;
+  googlePlaceName?: string;
+  googlePlaceRating?: number;
+  googlePlaceCategory?: string;
+  googlePlaceAddress?: string;
 }
