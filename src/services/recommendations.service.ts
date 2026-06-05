@@ -1,7 +1,8 @@
 import {FEATURES} from '../config/features';
-import {generateMockPlaceInsights} from './ai.service';
-import {searchNearbyPlaces} from './googlePlaces.service';
 import {PlaceAIInsights, PlaceExperience} from '../types/place';
+import {generateMockPlaceInsights} from './ai.service';
+import {enrichRecommendationsWithChatGPT} from './chatgpt.service';
+import {searchNearbyPlaces} from './googlePlaces.service';
 
 export const generatePlaceRecommendations = async (
   place: PlaceExperience,
@@ -17,16 +18,26 @@ export const generatePlaceRecommendations = async (
       latitude: place.latitude,
       longitude: place.longitude,
       category: mockInsights.category,
+      originalPlaceName: place.title,
     });
+
+    let finalRecommendations =
+      nearbyPlaces.length > 0 ? nearbyPlaces : mockInsights.recommendations;
+
+    if (FEATURES.USE_CHATGPT && nearbyPlaces.length > 0) {
+      finalRecommendations = await enrichRecommendationsWithChatGPT(
+        place,
+        finalRecommendations,
+      );
+    }
 
     return {
       ...mockInsights,
-      recommendations:
-        nearbyPlaces.length > 0 ? nearbyPlaces : mockInsights.recommendations,
+      recommendations: finalRecommendations,
       provider: FEATURES.USE_CHATGPT ? 'chatgpt' : 'mock',
     };
   } catch (error) {
-    console.error('[Recommendations] Error usando Google Places:', error);
+    console.error('[Recommendations] Error generando recomendaciones:', error);
 
     return mockInsights;
   }

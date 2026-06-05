@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 //import { generateMockPlaceInsights } from '../../services/ai.service';
-import {generatePlaceRecommendations} from '../../services/recommendations.service';
+import { generatePlaceRecommendations } from '../../services/recommendations.service';
 import { PlaceAIInsights } from '../../types/place';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,6 +36,19 @@ export const PlaceDetailScreen = ({ route, navigation }: Props) => {
   const openInGoogleMaps = async () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
     await Linking.openURL(url);
+  };
+
+  const openRecommendationInGoogleMaps = (
+    latitude?: number,
+    longitude?: number,
+  ) => {
+    if (!latitude || !longitude) {
+      return;
+    }
+
+    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+
+    Linking.openURL(url);
   };
 
   const handleGenerateAIInsights = async () => {
@@ -219,13 +232,21 @@ export const PlaceDetailScreen = ({ route, navigation }: Props) => {
                       </Text>
 
                       {aiInsights.recommendations.map((recommendation, index) => (
-                        <View
+                        <Pressable
                           key={`${recommendation.name}-${index}`}
-                          style={[
+                          onPress={() =>
+                            openRecommendationInGoogleMaps(
+                              recommendation.latitude,
+                              recommendation.longitude,
+                            )
+                          }
+                          disabled={!recommendation.latitude || !recommendation.longitude}
+                          style={({ pressed }) => [
                             styles.recommendationCard,
                             {
                               backgroundColor: colors.card,
                               borderColor: colors.border,
+                              opacity: pressed ? 0.82 : 1,
                             },
                           ]}>
                           <View style={styles.recommendationHeader}>
@@ -254,7 +275,13 @@ export const PlaceDetailScreen = ({ route, navigation }: Props) => {
                             style={[styles.recommendationDescription, { color: colors.muted }]}>
                             {recommendation.description}
                           </Text>
-                        </View>
+
+                          {recommendation.latitude && recommendation.longitude ? (
+                            <Text style={[styles.openMapHint, { color: colors.brand }]}>
+                              Toca para abrir en Google Maps
+                            </Text>
+                          ) : null}
+                        </Pressable>
                       ))}
                     </>
                   ) : (
@@ -468,6 +495,11 @@ const styles = StyleSheet.create({
   recommendationDescription: {
     fontSize: 13,
     lineHeight: 20,
+    marginTop: 10,
+  },
+  openMapHint: {
+    fontSize: 12,
+    fontWeight: '900',
     marginTop: 10,
   },
 });
